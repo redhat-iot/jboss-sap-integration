@@ -1,0 +1,21 @@
+# ignore Maven generated target folders
+target
+
+# ignore OS X specific files
+.DS_Store
+
+# generated 
+bin
+gen
+
+# Xcode
+xcuserdata
+*.xcworkspace
+
+# ignore eclipse files and folders
+.metadata
+/.metadata
+
+# log files
+*.log
+
