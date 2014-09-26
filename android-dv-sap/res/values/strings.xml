@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Travel Triage</string>
+    <string name="arrival_airport_hint">Select arrival airport</string>
+    <string name="arrival_airports">Arrival Airport:</string>
+    <string name="available_flights">Available Flights</string>
+    <string name="available_flights_progress_dialog_message">Searching for matching flights&#8230;</string>
+    <string name="available_flights_progress_dialog_title">Matching Flights Search</string>
+    <string name="book_flight_action">Book</string>
+    <string name="date_label">Travel Date:</string>
+    <string name="departure_airport_hint">Select departure airport</string>
+    <string name="departure_airports">Departure Airport:</string>
+    <string name="no_available_flights">No available flights for selections.</string>
+    <string name="no_selection">[ No Selection ]</string>
+    <string name="set_date">&#8230;</string>
+    <string name="set_travel_date_hint">Select travel date</string>
+
+    <string name="nextFlights">Flights</string>
+    <string name="viewAirportMaps">Airport Terminals</string>
+    <string name="viewAirportMapsDescription">View Airport Maps</string>
+    <string name="viewGoogleMap">Google Map View</string>
+    <string name="viewGoogleMapDescription">View Google Map</string>
+    <string name="arriving_flight_image_description">Arriving flight image</string>
+    <string name="available_maps">Maps</string>
+    <string name="details_tab_title">Details</string>
+    <string name="details_tab_activity_title">Flight Details</string>
+    <string name="departing_flight_image_description">Departing flight image</string>
+    <string name="flights_tab_title">Flights</string>
+    <string name="flights_tab_activity_title">Alternate Flights</string>
+    <string name="Gate">Departure Gate</string>
+    <string name="map_gallery_screen">Map Gallery</string>
+    <string name="map_screen">Location</string>
+    <string name="Terminal"></string>
+    <string name="terminal_map_image_description">Terminal map image</string>
+    <string name="las_airport">Airport Maps</string>
+    <string name="las_terminal_1_abc">Terminal 1: Concourse A, Concourse B, Concourse C</string>
+    <string name="las_terminal_1_d">Terminal 1: Concourse D</string>
+    <string name="las_terminal_3">Terminal 3</string>
+
+</resources>
