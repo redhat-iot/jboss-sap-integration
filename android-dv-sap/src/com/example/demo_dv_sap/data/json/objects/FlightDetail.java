@@ -18,7 +18,7 @@ public class FlightDetail {
 	private static final String TAG_ARRIVE_TIME = "arriveTime";
 	//private static final String TAG_ACTUAL_ARRIVE_TIME = "actualArriveTime";
 	private static final String TAG_AIRLINE_IATA = "airline_iata";
-	private static final String TAG_AIRPORT_FROM = "d:airportFrom";
+	private static final String TAG_AIRPORT_FROM = "flightDetails_airportFrom";
 	private static final String TAG_AIRPORT_TO = "toAirport";
 	//private static final String TAG_FLIGHT_DATE = "flightDate";
 	private static final String TAG_FLIGHT_NUMBER = "flightNo";
@@ -54,10 +54,8 @@ public class FlightDetail {
 			
 			// Storing each json item in variable
 			String airlineName = result.getString(TAG_AIRLINE_NAME);
-			String departTimeXsdDuration = result.getString(TAG_DEPART_TIME);
-		//	String actualDepartTime = result.getString(TAG_ACTUAL_DEPART_TIME);
-			String arriveTimeXsdDuration = result.getString(TAG_ARRIVE_TIME);
-		//	String actualArriveTime = result.getString(TAG_ACTUAL_ARRIVE_TIME);
+			String departTimeXsdDuration = jParser.parseTime(result.getString(TAG_DEPART_TIME));
+			String arriveTimeXsdDuration = jParser.parseTime(result.getString(TAG_ARRIVE_TIME));
 			String airline_iata = result.getString(TAG_AIRLINE_IATA);
 			String airportFrom = result.getString(TAG_AIRPORT_FROM);
 			String airportTo = result.getString(TAG_AIRPORT_TO);

@@ -13,6 +13,7 @@
 package com.example.demo_dv_sap;
 
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -45,6 +46,8 @@ import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
 
 import com.example.demo_dv_sap.R;
+import com.example.demo_dv_sap.data.json.objects.FlightDetail;
+import com.example.demo_dv_sap.data.json.objects.FlightSearchResults;
 import com.example.demo_dv_sap.model.Airport;
 import com.example.demo_dv_sap.model.Flight;
 import com.example.demo_dv_sap.model.FlightParcelable;
@@ -52,7 +55,7 @@ import com.example.demo_dv_sap.model.FlightParcelable;
 /**
  * The application main screen.
  */
-public final class FlightMqttActivity extends Activity implements DialogInterface.OnCancelListener {
+public final class FlightSearchActivity extends Activity implements DialogInterface.OnCancelListener {
 
     /**
      * A constant for no airport selected.
@@ -97,7 +100,7 @@ public final class FlightMqttActivity extends Activity implements DialogInterfac
 
     private int year = -1;
 
-    FlightMqttActivity accessThis() {
+    FlightSearchActivity accessThis() {
         return this;
     }
 
@@ -279,11 +282,14 @@ public final class FlightMqttActivity extends Activity implements DialogInterfac
         }
     }
 
-    private void loadFlights() {
+    private void loadFlights(final TextView txtTravelDate, final Airport departureAirport, final Airport arrivalAirport) {
         final AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
 
             private ProgressDialog dialog;
             private List<Flight> flights;
+            private TextView travelDate = txtTravelDate;
+            private Airport departAirport = departureAirport;
+            private Airport arriveAirport = arrivalAirport;
 
             /**
              * @see android.os.AsyncTask#doInBackground(Void[])
@@ -299,16 +305,28 @@ public final class FlightMqttActivity extends Activity implements DialogInterfac
                         throw new InterruptedException(); // TODO add message
                     }
 
-                    this.flights.add(new Flight("American Airlines", "AA", "100", "11:00 PM", "PT11H00M00S", "JFK", "2:00 PM", "PT14H01M00S", "SFO", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
-                                                "1", "2014-11-26T00:00.0", "A10", "DELAYED")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                    this.flights.add(new Flight("United", "UA", "400", "12:00 PM", "PT12H00M00S", "JFK", "3:00 PM", "PT15H00M00S","SFO", "1", "2014-11-26T00:00.0", "A10", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$
-                                                "ON TIME")); //$NON-NLS-1$
+                    FlightSearchResults flightSearchResults = new FlightSearchResults();
+                	
+                	String date = this.travelDate.getText().toString();
+                	
+                	Date dateObj = new Date(date);
+                	DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm.s");
+                	String s = df.format(dateObj);
+
+                	flightSearchResults.getResults(s, this.departAirport.getIata(), this.arriveAirport.getIata());
+                    this.flights=flightSearchResults.getFlights();
+                	
+                	
+//                    this.flights.add(new Flight("American Airlines", "AA", "100", "11:00 AM", "PT11H00M00S", "JFK", "2:00 PM", "PT14H01M00S", "SFO", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
+//                                                "1", "2014-11-26T00:00.0", "A10", "DELAYED")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+//                    this.flights.add(new Flight("United", "UA", "400", "12:00 PM", "PT12H00M00S", "JFK", "3:00 PM", "PT15H00M00S","SFO", "1", "2014-11-26T00:00.0", "A10", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$
+//                                                "ON TIME")); //$NON-NLS-1$
                     Thread.sleep(2000);
                 } catch (final Exception e) {
                     // TODO handle this
                     this.flights = Collections.emptyList();
                 }
-
+            	
                 return null;
             }
 
@@ -356,7 +374,7 @@ public final class FlightMqttActivity extends Activity implements DialogInterfac
     @Override
     public void onCreate( final Bundle savedInstanceState ) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.flight_mqtt_activity_main);
+        setContentView(R.layout.flight_search_activity_main);
 
         if (_noAirport == null) {
             _noAirport = new Airport(null, null, null, null) {
@@ -390,7 +408,7 @@ public final class FlightMqttActivity extends Activity implements DialogInterfac
     }
 
     void setFlights( final List<Flight> flights ) {
-        if (flights.isEmpty()) {
+        if (flights == null || flights.isEmpty()) {
             this.txtFlightsTableTitle.setText(R.string.no_available_flights);
         } else {
             this.txtFlightsTableTitle.setText(R.string.available_flights);
@@ -498,7 +516,7 @@ public final class FlightMqttActivity extends Activity implements DialogInterfac
         final boolean enable = ((this.arrivalAirport != _noAirport) && (this.departureAirport != _noAirport) && hasDate);
 
         if (enable) {
-            loadFlights();
+            loadFlights(this.txtTravelDate, this.departureAirport, this.arrivalAirport);
         }
     }
 

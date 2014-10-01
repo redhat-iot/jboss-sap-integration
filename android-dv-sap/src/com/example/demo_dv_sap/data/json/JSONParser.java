@@ -94,6 +94,7 @@ public class JSONParser {
 		String subString = pTime.substring(2);
 		subString = subString.replace("H", ":");
 		subString = subString.replace("M", ":");
+		subString = subString.substring(0, subString.lastIndexOf(":"));
 		subString = subString.replace("S", "");
 		return subString;
 	}

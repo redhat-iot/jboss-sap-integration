@@ -23,7 +23,7 @@ public class NextFlightDetails {
 	private static final String TAG_ARRIVE_TIME = "arriveTime";
 	// private static final String TAG_ACTUAL_ARRIVE_TIME = "actualArriveTime";
 	private static final String TAG_AIRLINE_IATA = "airline_iata";
-	private static final String TAG_AIRPORT_FROM = "d:airportFrom";
+	private static final String TAG_AIRPORT_FROM = "flightDetails_airportFrom";
 	private static final String TAG_AIRPORT_TO = "toAirport";
 	private static final String TAG_FLIGHT_NUMBER = "flightNo";
 	private static final String TAG_TERMINAL = "terminal";
