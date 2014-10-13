@@ -1,0 +1,36 @@
+# ignore Maven generated target folders
+target
+
+# ignore class files and their directories
+bin
+classes
+*.class
+
+# ignore eclipse files and folders
+.project
+.classpath
+.settings
+.metadata
+.scala_dependencies
+.externalToolBuilders
+/.metadata
+/RemoteSystemsTempFiles
+
+# ignore overlay folders
+overlays
+
+# ignore IDEA files
+*.iml
+*.ipr
+*.iws
+.idea
+atlassian-ide-plugin.xml
+
+# log files
+*.log
+
+# ignore OS X (Mac) files
+.DS_Store
+
+# ignore Android generated files
+gen
