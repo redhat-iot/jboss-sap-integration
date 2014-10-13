@@ -27,6 +27,7 @@ public class JSONParser {
 	static InputStream is = null;
 	static JSONObject jObj = null;
 	static String json = "";
+	static String PASSWORD = "{Enter password for the default Data Virtualization user}";
 
 	// constructor
 	public JSONParser() {
@@ -46,7 +47,7 @@ public class JSONParser {
 						"Authorization",
 						"Basic "
 								+ Base64.encodeToString(
-										("user" + ":" + "a7gqzYcA1rUm").getBytes(),
+										("user" + ":" + PASSWORD).getBytes(),
 										Base64.NO_WRAP));
 			}
 			httpGet.addHeader("Accept", "*/*;charset=utf-8");
