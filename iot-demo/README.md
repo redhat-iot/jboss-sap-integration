@@ -1,4 +1,4 @@
-JBoss A-MQ Biomedical Signals Sensor Monitor DashBoard IoT Demo 
+JBoss A-MQ, BRMS, SQLAnywhere, HANA IoT Demo 
 =====================================================================
 
 Demo based on JBoss A-MQ product.
@@ -6,7 +6,7 @@ Demo based on JBoss A-MQ product.
 Setup and Configuration
 -----------------------
 
-- Download JBoss A-MQ product from RED HAT (version 6.1) into install folder
+- Download JBoss A-MQ product from RED HAT (version 6.2) into install folder
 
 - run 'init.sh' 
 
