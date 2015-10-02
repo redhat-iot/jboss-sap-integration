@@ -17,15 +17,15 @@ Setup and Configuration
 
 - Startup the instance by
 
-	goto project/amqp-demo-web-biomedical
+	goto project/amqp-demo-web-retail
 	mvn jetty:run to startup the server 
 	
 	goto project/mqtt-drools
 	mvn camel:run -Psimple
 
-- verify Biomedical Signals Sensor Monitor DashBoard
+- verify  DashBoard
 
-    http://localhost:8282/demo/BiomedicalDashBoard.html
+    http://localhost:8282/demo/retailStoreDashboard.html
 
 - click on start button.
 
@@ -41,9 +41,7 @@ Released versions
 
 See the tagged releases for the following versions of the product:
 
-- v0.1 - JBoss A-MQ 6.1 and biometric dashboard installed.
+- v0.1 - JBoss A-MQ 6.2.
 
-![Biometrical Dashbaord](https://github.com/eschabell/amqp-demo-web-biomedical/blob/master/docs/demo-images/bio-dashboard.png?raw=true)
 
-![Install Console](https://github.com/eschabell/amqp-demo-web-biomedical/blob/master/docs/demo-images/install-console.png?raw=true)
 
