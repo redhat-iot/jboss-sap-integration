@@ -1,8 +1,8 @@
 #!/bin/sh 
-DEMO="JBoss A-MQ Biomedical IoT Demo"
-VERSION=6.1.0
-AUTHORS="Christina Lin"
-PROJECT="git@github.com:weimeilin79/amqp-demo-web-biomedical.git"
+DEMO="JBoss/SAP Retail Customers IoT Demo"
+VERSION=6.2.0
+AUTHORS="Prasanna Sivaramakrishan (Red Hat), Eric Farrar (SAP) and Ted Jones (Red Hat)"
+PROJECT="git@github.com:tejones/jboss-sap-integration.git"
 AMQ=jboss-a-mq-6.2.0.redhat-133
 AMQ_BIN=jboss-a-mq-6.2.0.redhat-133.zip
 DEMO_HOME=./target
@@ -22,7 +22,7 @@ chmod +x installs/*.zip
 echo
 echo "#################################################################"
 echo "##                                                             ##"   
-echo "##  Setting up the ${DEMO}   ##"
+echo "##  Setting up the ${DEMO}                                     ##"
 echo "##                                                             ##"   
 echo "##                                                             ##"   
 echo "##                 ###        #   #   ###                      ##"
@@ -33,9 +33,9 @@ echo "##                #   #       #   #   #####                    ##"
 echo "##                                                             ##"   
 echo "##                                                             ##"   
 echo "##  brought to you by,                                         ##"   
-echo "##                    ${AUTHORS}                            ##"
+echo "##                    ${AUTHORS}                               ##"
 echo "##                                                             ##"   
-echo "##  ${PROJECT}    ##"
+echo "##  ${PROJECT}                                                 ##"
 echo "##                                                             ##"   
 echo "#################################################################"
 echo

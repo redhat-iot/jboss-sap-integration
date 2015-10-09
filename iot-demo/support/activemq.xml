@@ -1,38 +1,35 @@
 <!--
-  Copyright (C) Red Hat, Inc.
-  http://redhat.com
 
-  Licensed under the Apache License, Version 2.0 (the "License");
-  you may not use this file except in compliance with the License.
-  You may obtain a copy of the License at
+     Copyright 2005-2014 Red Hat, Inc.
 
-     http://www.apache.org/licenses/LICENSE-2.0
+     Red Hat licenses this file to you under the Apache License, version
+     2.0 (the "License"); you may not use this file except in compliance
+     with the License.  You may obtain a copy of the License at
 
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  See the License for the specific language governing permissions and
-  limitations under the License.
-  -->
+        http://www.apache.org/licenses/LICENSE-2.0
 
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+     implied.  See the License for the specific language governing
+     permissions and limitations under the License.
+
+-->
 <beans
   xmlns="http://www.springframework.org/schema/beans"
   xmlns:amq="http://activemq.apache.org/schema/core"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
   http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/activemq-core.xsd">
 
     <!-- Allows us to use system properties and fabric as variables in this configuration file -->
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="properties">
-            <bean class="org.fusesource.mq.fabric.ConfigurationProperties"/>
-        </property>      
+            <bean class="io.fabric8.mq.fabric.ConfigurationProperties"/>
+        </property>
     </bean>
 
-    <broker xmlns="http://activemq.apache.org/schema/core"
-            brokerName="${broker-name}"
-            dataDirectory="${data}"
-            start="false" restartAllowed="false">
+    <broker xmlns="http://activemq.apache.org/schema/core" brokerName="${broker-name}" dataDirectory="${data}" start="false" restartAllowed="false">
 
         <destinationPolicy>
             <policyMap>
@@ -47,7 +44,7 @@
               </policyEntries>
             </policyMap>
         </destinationPolicy>
- 
+
         <managementContext>
             <managementContext createConnector="false"/>
         </managementContext>
@@ -58,12 +55,27 @@
 
         <plugins>
             <jaasAuthenticationPlugin configuration="karaf" />
+            <authorizationPlugin>
+              <map>
+                <authorizationMap groupClass="org.apache.karaf.jaas.boot.principal.RolePrincipal">
+                  <!-- manager,viewer,Operator,Maintainer,Deployer,Auditor,Administrator,SuperUser,admin,User -->
+                  <authorizationEntries>
+                    <authorizationEntry queue=">" read="manager,viewer,Operator,Maintainer,Deployer,Auditor,Administrator,SuperUser,admin" write="manager,Operator,Maintainer,Deployer,Auditor,Administrator,SuperUser,admin" admin="manager,Operator,Maintainer,Deployer,Auditor,Administrator,SuperUser,admin"/>
+                    <authorizationEntry topic=">" read="manager,viewer,Operator,Maintainer,Deployer,Auditor,Administrator,SuperUser,admin" write="manager,Operator,Maintainer,Deployer,Auditor,Administrator,SuperUser,admin" admin="manager,Operator,Maintainer,Deployer,Auditor,Administrator,SuperUser,admin"/>
+                    <authorizationEntry topic="ActiveMQ.Advisory.>" read="manager,viewer,Operator,Maintainer,Deployer,Auditor,Administrator,SuperUser,admin,User" write="manager,viewer,Operator,Maintainer,Deployer,Auditor,Administrator,SuperUser,admin,User" admin="manager,viewer,Operator,Maintainer,Deployer,Auditor,Administrator,SuperUser,admin,User" />
+                  </authorizationEntries>
+                  <tempDestinationAuthorizationEntry>
+                    <tempDestinationAuthorizationEntry read="manager,viewer,Operator,Maintainer,Deployer,Auditor,Administrator,SuperUser,admin" write="manager,Operator,Maintainer,Deployer,Auditor,Administrator,SuperUser,admin" admin="manager,Operator,Maintainer,Deployer,Auditor,Administrator,SuperUser,admin"/>
+                  </tempDestinationAuthorizationEntry>
+                </authorizationMap>
+              </map>
+            </authorizationPlugin>
         </plugins>
 
         <systemUsage>
             <systemUsage>
                 <memoryUsage>
-                    <memoryUsage limit="64 mb"/>
+                    <memoryUsage percentOfJvmHeap="70"/>
                 </memoryUsage>
                 <storeUsage>
                     <storeUsage limit="100 gb"/>
@@ -73,11 +85,11 @@
                 </tempUsage>
             </systemUsage>
         </systemUsage>
-        
+
         <transportConnectors>
             <transportConnector name="openwire" uri="tcp://0.0.0.0:0?maximumConnections=1000"/>
-            <transportConnector name="amqp" uri="amqp://0.0.0.0:5672"/>
-            <transportConnector name="mqtt" uri="mqtt://0.0.0.0:1883"/>
+	    <transportConnector name="amqp" uri="amqp://0.0.0.0:5672"/>
+	    <transportConnector name="mqtt" uri="mqtt://localhost:1883"/>
         </transportConnectors>
     </broker>
 
