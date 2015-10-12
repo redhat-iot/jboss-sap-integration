@@ -45,6 +45,12 @@
             </policyMap>
         </destinationPolicy>
 
+ 	<destinations>
+           <topic physicalName="customer/enter">
+           <topic physicalName="customer/move">
+           <topic physicalName="customer/exit">
+        </destinations>
+
         <managementContext>
             <managementContext createConnector="false"/>
         </managementContext>

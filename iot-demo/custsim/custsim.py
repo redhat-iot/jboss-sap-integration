@@ -107,14 +107,14 @@ def main():
          if c.isExiting and c.currentLocation.x == 0 and c.currentLocation.y == 0:
             # remove the customer and signal the exit
             msg = {'id': str(c.id), 'ts': int(datetime.datetime.now().strftime("%s"))}
-          #  mqttc.publish("customer/exit", json.dumps(msg))
+            mqttc.publish("customer/exit", json.dumps(msg))
             print('%s is Exiting.') % (c.id)
             customerQueue.remove(c)
          else:
             # signal move
  	    msg = {'id': str(c.id), 'ts': int(datetime.datetime.now().strftime("%s")), 'x': c.currentLocation.x, 'y': c.currentLocation.y}
             print('Customer is Moving: %s.') % (msg)
-            #mqttc.publish("customer/move", json.dumps(msg))
+            mqttc.publish("customer/move", json.dumps(msg))
 
    # Check if any customers are due to entier, move, or exit. Sleep for one second, then repeat
    while True:
@@ -124,7 +124,7 @@ def main():
          customerQueue.append(newCustomer)
 
          msg = {'id': str(newCustomer.id), 'ts': int(datetime.datetime.now().strftime("%s"))}
-        #mqttc.publish("customer/enter", json.dumps(msg))
+         mqttc.publish("customer/enter", json.dumps(msg))
 
          nextCustomerEntranceTime = datetime.datetime.now() + datetime.timedelta(0, random.uniform(1, 600 / averageCustomersInStore))
          print('%s is Entering. MDT: %0.1f, C: %0.1f, E: %s') % (newCustomer.id, newCustomer.meanDwellTime, newCustomer.consistancy, newCustomer.exitTime)
