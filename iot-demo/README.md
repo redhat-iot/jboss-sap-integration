@@ -28,20 +28,6 @@ Setup and Configuration
   Linux: http://docs.python-guide.org/en/latest/starting/install/linux/
   Windows: https://www.python.org/downloads/windows/
 
-- Startup the instance by
-
-	goto project/amqp-demo-web-retail
-	mvn jetty:run to startup the server 
-	
-	goto project/mqtt-drools
-	mvn camel:run -Psimple
-
-- verify  DashBoard
-
-    http://localhost:8282/demo/retailStoreDashboard.html
-
-- click on start button.
-
 
 Supporting Articles
 -------------------
