@@ -24,7 +24,7 @@ Setup and Configuration
   To execute this script you will need Python installed and can exexute the script using 
   the command "python custsim.py" from the custsim folder. 
 
-- Download [SQL Anywhere 17 Developer Edition][https://www.sap.com/cmp/syb/crm-xm15-dwn-dt015/index.html] and install. You may need to [source the binaries][http://dcx.sap.com/index.html#sqla170/en/html/8135b1bb6ce2101499f0f55a54bc1ab2.html] before using.
+- Download [SQL Anywhere 17 Developer Edition](https://www.sap.com/cmp/syb/crm-xm15-dwn-dt015/index.html) and install. You may need to [source the binaries](http://dcx.sap.com/index.html#sqla170/en/html/8135b1bb6ce2101499f0f55a54bc1ab2.html) before using.
 
 - Rename persistance/remote.cfg.example to persistance/remote.cfg and set the correct host and port for fuse
 
