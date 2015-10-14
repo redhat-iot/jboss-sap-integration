@@ -1,3 +1,3 @@
 [FUSE]
-host=localhost
-port=8083
+fuse_host=localhost
+fuse_port=8083
