@@ -23,6 +23,12 @@ Setup and Configuration
   related to a retail store (entering, moving and exiting).
   To execute this script you will need Python installed and can exexute the script using 
   the command "python custsim.py" from the custsim folder. 
+  
+  Installing Python:
+
+   OSx: https://www.python.org/downloads/mac-osx/ 
+   Linux: http://docs.python-guide.org/en/latest/starting/install/linux/    
+   Windows: https://www.python.org/downloads/windows/
 
 - Download [SQL Anywhere 17 Developer Edition](https://www.sap.com/cmp/syb/crm-xm15-dwn-dt015/index.html) and install. You may need to [source the binaries](http://dcx.sap.com/index.html#sqla170/en/html/8135b1bb6ce2101499f0f55a54bc1ab2.html) before using.
 
@@ -32,13 +38,6 @@ Setup and Configuration
   - dbinit -dba dba,sqlsql remote.db
   - dbsrv17 -ud -xs http{port=8080} remote.db
   - dbisql -c "uid=dba;pwd=sqlsql" remote.sql
- 
-  Installing Python:
-
-  OSx: https://www.python.org/downloads/mac-osx/
-  Linux: http://docs.python-guide.org/en/latest/starting/install/linux/
-  Windows: https://www.python.org/downloads/windows/
-
 
 Supporting Articles
 -------------------
