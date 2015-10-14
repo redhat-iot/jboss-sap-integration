@@ -158,9 +158,9 @@ go
 GRANT EXECUTE ON "dba"."sp_CustomerClassification" TO "fuse"
 go
 
-create procedure "dba"."SalesNotification"( in "fuse_host" long varchar,in "fuse_port" long varchar,in "postBody" long varchar ) 
+create procedure "dba"."SalesNotification"( in "host" long varchar,in "port" long varchar,in "postBody" long varchar ) 
 result( "Attribute" long varchar,"Value" long varchar ) 
-url 'http://!fuse_host:!fuse_port/sales/notification'
+url 'http://!host:!port/sales/notification'
 type 'HTTP:POST:text/xml'
 go
 
