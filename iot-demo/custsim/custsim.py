@@ -1,5 +1,6 @@
 import random, time, datetime, uuid, json, ConfigParser, os
 import paho.mqtt.client as mqtt
+import csv
 
 
 # This script generates the following MQTT messages
@@ -7,14 +8,14 @@ import paho.mqtt.client as mqtt
 # 1. customer/enter
 #
 #    { 
-#      id: --GUID representing customer--,
+#      id: --ID representing customer--,
 #      ts: --timestamp of the entrance, in seconds since epoch--
 #    }
 #
 # 2. customer/move
 #
 #    { 
-#      id: --GUID representing customer--,
+#      id: --ID representing customer--,
 #      ts: --timestamp of the move, in seconds since epoch--,
 #       x: --x coordinate of location sensor that fired--,
 #       y: --y coordinate of location sensor that fired--
@@ -23,7 +24,7 @@ import paho.mqtt.client as mqtt
 # 2. customer/exit
 #
 #    { 
-#      id: --GUID representing customer--,
+#      id: --ID representing customer--,
 #      ts: --timestamp of the exit, in seconds since epoch--
 #    }
 #
@@ -43,7 +44,7 @@ class Store:
       self.locations = [[Location(x,y, width, height) for y in range(0,height)] for x in range(0, width)]
 
 class Customer:
-   def __init__(self, store):
+   def __init__(self, store, id, name):
       self.store = store
       self.currentLocation = store.locations[0][0]  # customers enter and exit from the bottom left corner of the store
 
@@ -52,7 +53,8 @@ class Customer:
       self.nextMoveTime = self.getNextMoveTime()   
       self.isExiting = False
       self.exitTime = datetime.datetime.now() + datetime.timedelta(0, random.uniform(1, 600))  # the time this customer will start to exit
-      self.id = uuid.uuid1()
+      self.id = id
+      self.name = name
 
    def getNextMoveTime(self):
       # amount of time spent at a location is a random value picked from a guassian distribution, with a mean equal to the customer's 
@@ -84,7 +86,7 @@ class Customer:
       return False
 
 def main():
-
+  
    # configuration information
    config = ConfigParser.ConfigParser()
    config.read('config.cfg')
@@ -94,9 +96,19 @@ def main():
    width = config.getint('Store', 'width')
    height = config.getint('Store', 'height')
    averageCustomersInStore = config.getint('Customers', 'averageCustomersInStore')
+   fakeDataFile = config.get('Customers', 'list')
 
    mqttc = mqtt.Client(mqttClientName)
    mqttc.connect(mqttHost, mqttPort)
+  
+   # load customer list
+   try:
+      with open(fakeDataFile, 'rb') as csvfile:
+         fakereader = csv.reader(csvfile, delimiter='|')
+         customerList = [row for row in fakereader]
+   except IOError as e:
+      print("Whoops....can't find the fake data file.\nTry generating the fake data file and try again\n")
+      exit(0)
 
    myStore = Store(width, height)
    customerQueue = []   # List of customers in the store
@@ -107,27 +119,27 @@ def main():
          if c.isExiting and c.currentLocation.x == 0 and c.currentLocation.y == 0:
             # remove the customer and signal the exit
             msg = {'id': str(c.id), 'ts': int(datetime.datetime.now().strftime("%s"))}
-          #  mqttc.publish("customer/exit", json.dumps(msg))
-            print('%s is Exiting.') % (c.id)
+            mqttc.publish("customer/exit", json.dumps(msg))
+            print('%s is Exiting.') % (c.name)
             customerQueue.remove(c)
          else:
             # signal move
- 	    msg = {'id': str(c.id), 'ts': int(datetime.datetime.now().strftime("%s")), 'x': c.currentLocation.x, 'y': c.currentLocation.y}
-            print('Customer is Moving: %s.') % (msg)
-            #mqttc.publish("customer/move", json.dumps(msg))
+            msg = {'id': str(c.id), 'ts': int(datetime.datetime.now().strftime("%s")), 'x': c.currentLocation.x, 'y': c.currentLocation.y}
+            mqttc.publish("customer/move", json.dumps(msg))
 
    # Check if any customers are due to entier, move, or exit. Sleep for one second, then repeat
    while True:
       if nextCustomerEntranceTime < datetime.datetime.now():
          # add the new customer, and signal the entrance
-         newCustomer = Customer(myStore)
+         newCustomerPrototype = random.choice(customerList)
+         newCustomer = Customer(myStore, newCustomerPrototype[0], newCustomerPrototype[1])
          customerQueue.append(newCustomer)
 
          msg = {'id': str(newCustomer.id), 'ts': int(datetime.datetime.now().strftime("%s"))}
-        #mqttc.publish("customer/enter", json.dumps(msg))
+         mqttc.publish("customer/enter", json.dumps(msg))
 
          nextCustomerEntranceTime = datetime.datetime.now() + datetime.timedelta(0, random.uniform(1, 600 / averageCustomersInStore))
-         print('%s is Entering. MDT: %0.1f, C: %0.1f, E: %s') % (newCustomer.id, newCustomer.meanDwellTime, newCustomer.consistancy, newCustomer.exitTime)
+         print('%s is Entering. MDT: %0.1f, C: %0.1f, E: %s') % (newCustomer.name, newCustomer.meanDwellTime, newCustomer.consistancy, newCustomer.exitTime)
          print('Next Customer Entering at %s.') % (nextCustomerEntranceTime)
 
       [manageCustomerMovements(c) for c in customerQueue]  

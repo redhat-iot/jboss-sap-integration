@@ -1,0 +1,3 @@
+[FUSE]
+fuse_host=localhost
+fuse_port=8083
