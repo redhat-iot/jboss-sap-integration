@@ -25,9 +25,9 @@
       <version>6.1.0.GA-redhat-2</version>
       <relativePath>../pom.xml</relativePath>
     </parent>
-
-    <artifactId>brms-helloworld-drl</artifactId>
-    <name>JBoss BRMS Quickstart: helloworld-drl</name>
+   
+    <artifactId>brms-amq-sap</artifactId>
+    <name>JBoss SAP Demo Project</name>
     <licenses>
         <license>
             <name>Apache License, Version 2.0</name>
@@ -70,6 +70,21 @@
     </dependencyManagement>
     <dependencies>
         <dependency>
+	        <groupId>javax.inject</groupId>
+	        <artifactId>javax.inject</artifactId>
+	        <version>1</version><!--$NO-MVN-MAN-VER$-->
+        </dependency>
+        <dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>20150729</version><!--$NO-MVN-MAN-VER$-->
+		</dependency>
+        <dependency>
+            <groupId>org.eclipse.paho</groupId>
+            <artifactId>mqtt-client</artifactId>
+            <version>0.4.0</version>
+        </dependency>
+        <dependency>
             <groupId>org.kie</groupId>
             <artifactId>kie-api</artifactId>
         </dependency>
@@ -94,8 +109,5 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-    <build>
-        <finalName>${project.artifactId}</finalName>
-    </build>
-
+   
 </project>
