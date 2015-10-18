@@ -1,0 +1,76 @@
+//created on: Oct 7, 2015
+package retailtrackerdrl
+
+//list any import classes here.
+import org.jboss.brmspojos.CustomerObj;
+import org.jboss.brmspojos.Department;
+import org.jboss.brmspojos.CustomerDeptEvent;
+import org.jboss.brmspojos.CustomerMoveEvent;
+
+
+
+declare CustomerMoveEvent
+    @role ( event )
+end
+
+
+rule "Customer entered a department and is not in a list of special departments"
+ 
+when
+//conditions
+
+$customer : CustomerObj( $cid: custId, $p: location, $cnt : deptVisitCount)
+Department( $dname: departmentName, $dloc: deptLocation,
+$dloc.contains( $p ))
+then
+//actions
+System.out.println("\nPrint Pending Items Rule");
+        
+$customer.setDeptVisitCount( $customer.getDeptVisitCount() + 1 );
+
+end
+
+/*rule "Customer moves and check if customer already exists "
+   when
+       System.out.println("Sale approved");
+       CustomerMoveEvent( $custId : custId , $loc : location, $timestamp : timestamp)
+       not CustomerObj( custId == $custId );
+   
+   then
+      // invoke web service to insert data
+       System.out.println(" Customer :" + $custId);
+      //insert new CustomerObj(custId, timestamp, null, loc, null);
+end*/
+
+/*rule "Customer moves and check if customer already exists "
+   when
+      $cust.visitCount >= 3
+   
+   then
+      // invoke web service to insert data
+end*/
+
+
+/*rule "Customer in special department and moves"
+    when
+        $customer : CustomerObj( $cid: custId, $p: location, $cnt : deptVisitCount )
+        Department( $dname: departmentName, $dloc: deptLocation,
+                $dloc.contains( $p ) and specialDepList contains($dname))
+
+        )
+    then
+    // invoke web service to store customer event
+      
+end*/
+
+/*rule "Customer spends about 10-20 moves in a department then get average timespent"
+no-loop
+    when
+        //conditions
+         
+       
+    then
+        //actions
+        
+               
+end*/
