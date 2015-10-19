@@ -6,7 +6,7 @@ go
 -------------------------------------------------
 
 CREATE TABLE "dba"."Customers" (
-    "id"                             long varchar NOT NULL
+    "id"                             integer NOT NULL
    ,"name"                           long varchar NOT NULL
    ,"lastVisit"                      bigint NULL
    ,"averagePurchaseAmount"          numeric(6,2) NULL
@@ -14,16 +14,9 @@ CREATE TABLE "dba"."Customers" (
 )
 go
 
-
-BEGIN
-  declare filePath long varchar = SUBSTRING(DB_PROPERTY('File'), 0, LOCATE(DB_PROPERTY('File'), '/', -1 )) || '/customers.dat';
-  LOAD TABLE Customers USING FILE filePath DELIMITED BY '|';
-END
-go
-
 CREATE TABLE "dba"."CustomerMovements" (
     "id"                             integer NOT NULL DEFAULT global autoincrement(100000)
-   ,"customerID"                     long varchar NULL
+   ,"customerID"                     integer NOT NULL
    ,"locationX"                      integer NOT NULL
    ,"locationY"                      integer NOT NULL
    ,"ts"                             timestamp NOT NULL
@@ -33,7 +26,7 @@ go
 
 CREATE TABLE "dba"."CustomerDepartments" (
     "id"                             integer NOT NULL DEFAULT global autoincrement(100000)
-   ,"customerID"                     long varchar NULL
+   ,"customerID"                     integer NOT NULL
    ,"departmentID"                   integer NOT NULL
    ,"ts"                             timestamp NOT NULL
    ,PRIMARY KEY ("id" ASC) 
@@ -201,5 +194,14 @@ CREATE SERVICE "customer/movement"
 call "dba"."sp_CustomerMovement"()
 go
 
-SET OPTION PUBLIC.global_database_id = 2
+CREATE PUBLICATION store_demo (
+  TABLE Customers, TABLE CustomerDepartments, TABLE CustomerMovements
+)
 go
+
+CREATE SYNCHRONIZATION USER "remote" TYPE tcpip
+go
+
+CREATE SYNCHRONIZATION SUBSCRIPTION TO store_demo FOR "remote"
+go
+
