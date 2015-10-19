@@ -42,10 +42,12 @@ public class RuleProcessor {
 
 	public static KieSession insertDepartments() {
 
-		Rectangle deptLocationOne = new Rectangle(1, 2, 2, 4);
+		Rectangle deptLocationOne = new Rectangle(1, 2, 3, 5);
 		Rectangle deptLocationTwo = new Rectangle(2, 3, 2, 4);
-		Rectangle deptLocationThree = new Rectangle(2, 2, 3, 4);
-		Rectangle deptLocationFour = new Rectangle(4, 2, 2, 4);
+		Rectangle deptLocationThree = new Rectangle(3, 4, 5, 4);
+		Rectangle deptLocationFour = new Rectangle(4, 4, 3, 5);
+		Rectangle deptLocationFive = new Rectangle(5, 5, 2, 4);
+		Rectangle deptLocationSix = new Rectangle(4, 2, 2, 4);
        
 		 
 		Department deptOne = new Department("PHARMACY", deptLocationOne,
@@ -56,9 +58,9 @@ public class RuleProcessor {
 				Department.REGULAR);
 		Department deptFour = new Department("TOYS", deptLocationFour,
 				Department.REGULAR);
-		Department deptFive = new Department("STATIONARY", deptLocationFour,
+		Department deptFive = new Department("STATIONARY", deptLocationFive,
 				Department.REGULAR);
-		Department deptSix = new Department("JEWELRY", deptLocationFour,
+		Department deptSix = new Department("JEWELRY", deptLocationSix,
 				Department.REGULAR);
 
 		kSession.insert(deptOne);
@@ -72,32 +74,36 @@ public class RuleProcessor {
 
 	}
 
-	/*public static void invokeRules(KieSession kSession, String message) {
+	 public static void invokeRules(String message) {
 
-		Point custPt = new Point(2, 2);
-		Point custPt1 = new Point(3, 3);
-		Rectangle deptLocation = new Rectangle(1, 2, 2, 4);
+		kSession = getKieSession();
+		kSession = insertDepartments();
+		
+	
+        String jsonString = null;
+       
+        
+		if (message.contains("Customer is Moving")) {
+			jsonString = message.substring(
+					message.indexOf(": ") + 2, message.length());
+			JSONObject obj = new JSONObject(jsonString);
 
-		Department dept = new Department("PHARMACY", deptLocation,
-				Department.SPECIAL);
+			int x = obj.getInt("x");
+			int y = obj.getInt("y");
+			String id = obj.getString("id");
+			long timestamp = obj.getLong("ts");
+			Point p = new Point(x, y);
+			CustomerMoveEvent cm = new CustomerMoveEvent(id, p, timestamp);
+			kSession.insert(cm);
+	        kSession.fireAllRules();
+		}
 
-		// CustomerObj c = new CustomerObj("122ATP1212", 1223323, 0, custPt,
-		// dept);
-		CustomerObj c = new CustomerObj("122ATP1212", custPt);
-		CustomerObj c1 = new CustomerObj("A122ATP1212", custPt1);
-		CustomerObj c3 = new CustomerObj("122ATP1212BB", custPt);
-		CustomerObj c4 = new CustomerObj("A122ATP1212ff", custPt1);
-		CustomerObj c5 = new CustomerObj("122ATP1212", custPt);
-		kSession.insert(c);
-		kSession.insert(c1);
-		kSession.insert(c3);
-		kSession.insert(c4);
-		kSession.insert(c5);
-		kSession.insert(dept);
-		kSession.fireAllRules();
-	}*/
+		
+   
+        
+	}
 
-	public static void invokeRules(KieSession kSession, String message) {
+	public static void invokeRulesAlt(KieSession kSession, String message) {
 		String test = "Customer is Moving: {'y': 4, 'x': 1, 'id': '4c8ec014-73c8-11e5-91d7-a0999b16826b', 'ts': 1444974046}";
 
 		String jsonString = null;
