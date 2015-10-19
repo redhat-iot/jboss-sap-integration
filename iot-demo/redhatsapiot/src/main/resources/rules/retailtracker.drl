@@ -10,6 +10,8 @@ import org.jboss.brmspojos.CustomerDeptEvent;
 import org.jboss.brmspojos.CustomerMoveEvent;
 import org.jboss.brmspojos.CustomerMoveObj;
 
+import org.jboss.amqconnector.ClassificationMsgPublisher;
+
 import org.jboss.sapconnector.SapServiceProcessor;
 
 import org.w3c.dom.Document;
@@ -269,6 +271,8 @@ then
 System.out.println("customer classification is focused fast moving customer");
 Document doc = SapServiceProcessor.constructCustomerClass($custId, 2 , $timestamp);
 SapServiceProcessor.processXml(doc,SapServiceProcessor.CUST_CLASS_URL_CALL);
+System.out.println("publish to salesnotification topic");
+ClassificationMsgPublisher.doDemo($custId, $location, $timestamp, "focussed customer");
 end
 
 rule "Customer is a browsing customer"
@@ -282,5 +286,9 @@ then
 System.out.println("customer classification is a browsing customer");
 Document doc = SapServiceProcessor.constructCustomerClass($custId, 1 , $timestamp);
 SapServiceProcessor.processXml(doc,SapServiceProcessor.CUST_CLASS_URL_CALL);
+System.out.println("publish to salesnotification topic");
+
+ClassificationMsgPublisher.doDemo($custId, $location, $timestamp, "browsing customer");
+
 end
 
