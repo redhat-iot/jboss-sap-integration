@@ -4,6 +4,8 @@ public class CustomerDeptEvent {
 	private Integer custId;
 	private Department dept;
 	private Integer visitCount;
+	private boolean messageSent;
+	
 	public Integer getCustId() {
 		return custId;
 	}
@@ -21,6 +23,12 @@ public class CustomerDeptEvent {
 	}
 	public void setVisitCount(Integer visitCount) {
 		this.visitCount = visitCount;
+	}
+	public boolean isMessageSent() {
+		return messageSent;
+	}
+	public void setMessageSent(boolean messageSent) {
+		this.messageSent = messageSent;
 	}
 
 }

@@ -105,8 +105,8 @@ public class MsgPublisher implements MqttCallback {
 	public void messageArrived(String topic, MqttMessage message) {
 		String msg = message.toString();
 		System.out.println("Received: " + msg);
-		 
-		//RuleProcessor.invokeRules(RuleProcessor.getKieSession(), msg);
+		 // Entry Point to invoke rules
+		RuleProcessor.invokeRules(RuleProcessor.getKieSession(), msg);
 	}
 
 	public void deliveryComplete(IMqttDeliveryToken token) {

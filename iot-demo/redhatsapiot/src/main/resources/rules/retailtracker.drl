@@ -4,73 +4,283 @@ package retailtrackerdrl
 //list any import classes here.
 import org.jboss.brmspojos.CustomerObj;
 import org.jboss.brmspojos.Department;
+import org.jboss.brmspojos.DepartmentType;
+
 import org.jboss.brmspojos.CustomerDeptEvent;
 import org.jboss.brmspojos.CustomerMoveEvent;
+import org.jboss.brmspojos.CustomerMoveObj;
 
+import org.jboss.sapconnector.SapServiceProcessor;
+
+import org.w3c.dom.Document;
 
 
 declare CustomerMoveEvent
     @role ( event )
 end
 
+rule "Customer moves and does not exist result in new customer for each department- pharmacy"
 
-rule "Customer entered a department and is not in a list of special departments"
- 
 when
-//conditions
+CustomerMoveEvent( $custId : custId, $location : location, $timestamp : timestamp)
+dept : Department(departmentName == "PHARMACY", $dloc: deptLocation, $dloc.contains( $location ))
+not CustomerObj( custId == $custId)
 
-$customer : CustomerObj( $cid: custId, $p: location, $cnt : deptVisitCount)
-Department( $dname: departmentName, $dloc: deptLocation,
-$dloc.contains( $p ))
 then
-//actions
-System.out.println("\nPrint Pending Items Rule");
-        
-$customer.setDeptVisitCount( $customer.getDeptVisitCount() + 1 );
+System.out.println("moving "+$custId);
+
+
+insert(new CustomerObj($custId, $location, $timestamp , 0 , dept.getDepartmentName()));
+insert(new CustomerMoveObj($custId, 0));
+end
+
+
+rule "Customer moves and does not exist result in new customer for each department-food"
+
+when
+CustomerMoveEvent( $custId : custId, $location : location, $timestamp : timestamp)
+dept : Department(departmentName == "FOOD", $dloc: deptLocation, $dloc.contains( $location ))
+not CustomerObj( custId == $custId)
+
+then
+System.out.println("moving "+$custId);
+
+insert(new CustomerObj($custId, $location, $timestamp , 0 , dept.getDepartmentName()));
+insert(new CustomerMoveObj($custId, 0));
+end
+
+rule "Customer moves and does not exist result in new customer for each department-clothing"
+
+when
+CustomerMoveEvent( $custId : custId, $location : location, $timestamp : timestamp)
+dept : Department(departmentName == "CLOTHING", $dloc: deptLocation, $dloc.contains( $location ))
+not CustomerObj( custId == $custId)
+
+then
+System.out.println("moving "+$custId);
+
+insert(new CustomerObj($custId, $location, $timestamp , 0 , dept.getDepartmentName()));
+insert(new CustomerMoveObj($custId, 0));
+end
+
+rule "Customer moves and does not exist result in new customer for each department-toys"
+
+when
+CustomerMoveEvent( $custId : custId, $location : location, $timestamp : timestamp)
+dept : Department(departmentName == "TOYS", $dloc: deptLocation, $dloc.contains( $location ))
+not CustomerObj( custId == $custId)
+
+then
+System.out.println("moving "+$custId);
+
+insert(new CustomerObj($custId, $location, $timestamp , 0 , dept.getDepartmentName()));
+insert(new CustomerMoveObj($custId, 0));
+end
+
+
+rule "Customer moves and does not exist result in new customer for each department-stationary"
+
+when
+CustomerMoveEvent( $custId : custId, $location : location, $timestamp : timestamp)
+dept : Department(departmentName == "STATIONARY", $dloc: deptLocation, $dloc.contains( $location ))
+not CustomerObj( custId == $custId)
+
+then
+System.out.println("moving "+$custId);
+
+insert(new CustomerObj($custId, $location, $timestamp , 0 , dept.getDepartmentName()));
+insert(new CustomerMoveObj($custId, 0));
+end
+
+rule "Customer moves and does not exist result in new customer for each department-jewelry"
+
+when
+CustomerMoveEvent( $custId : custId, $location : location, $timestamp : timestamp)
+dept : Department(departmentName == "JEWELRY", $dloc: deptLocation, $dloc.contains( $location ))
+not CustomerObj( custId == $custId)
+
+then
+System.out.println("moving "+$custId);
+
+insert(new CustomerObj($custId, $location, $timestamp , 0 , dept.getDepartmentName()));
+insert(new CustomerMoveObj($custId, 0));
+end
+
+rule "Customer in Pharmacy department (special) then increment visit count and invoke web service"
+no-loop
+when 
+CustomerMoveEvent($custId :custId, $location : location, $timestamp : timestamp)
+dept : Department(departmentName == "PHARMACY", $dloc: deptLocation, $dloc.contains( $location ))
+custObj : CustomerObj( custId == $custId)
+custMvObj : CustomerMoveObj( custId == $custId)
+then
+modify(custObj){setDeptVisitCount(custObj.getDeptVisitCount() + 1), setDeptName(dept.getDepartmentName())};
+modify(custMvObj){setTotalMoves(custMvObj.getTotalMoves() + 1)};
+System.out.println("department " +dept.getDepartmentName());
+System.out.println("customer's pharmacy visit count " +custObj.getDeptVisitCount());
+Document doc = SapServiceProcessor.constructCustomerMove($custId, $location, $timestamp);
+SapServiceProcessor.processXml(doc,SapServiceProcessor.CUST_MOVE_URL_CALL);
 
 end
 
-/*rule "Customer moves and check if customer already exists "
-   when
-       System.out.println("Sale approved");
-       CustomerMoveEvent( $custId : custId , $loc : location, $timestamp : timestamp)
-       not CustomerObj( custId == $custId );
-   
-   then
-      // invoke web service to insert data
-       System.out.println(" Customer :" + $custId);
-      //insert new CustomerObj(custId, timestamp, null, loc, null);
-end*/
 
-/*rule "Customer moves and check if customer already exists "
-   when
-      $cust.visitCount >= 3
-   
-   then
-      // invoke web service to insert data
-end*/
-
-
-/*rule "Customer in special department and moves"
-    when
-        $customer : CustomerObj( $cid: custId, $p: location, $cnt : deptVisitCount )
-        Department( $dname: departmentName, $dloc: deptLocation,
-                $dloc.contains( $p ) and specialDepList contains($dname))
-
-        )
-    then
-    // invoke web service to store customer event
-      
-end*/
-
-/*rule "Customer spends about 10-20 moves in a department then get average timespent"
+rule "Customer in food department (special) then increment visit count and invoke web service"
 no-loop
-    when
-        //conditions
-         
-       
-    then
-        //actions
-        
-               
-end*/
+when 
+CustomerMoveEvent($custId :custId, $location : location, $timestamp : timestamp)
+dept : Department(departmentName == "FOOD", $dloc: deptLocation, $dloc.contains( $location ))
+custObj : CustomerObj( custId == $custId)
+custMvObj : CustomerMoveObj( custId == $custId)
+
+then
+modify(custObj){setDeptVisitCount(custObj.getDeptVisitCount() + 1), setDeptName(dept.getDepartmentName())};
+modify(custMvObj){setTotalMoves(custMvObj.getTotalMoves() + 1)};
+System.out.println("department " +dept.getDepartmentName());
+System.out.println("customer's food visit count " +custObj.getDeptVisitCount());
+Document doc = SapServiceProcessor.constructCustomerMove($custId, $location, $timestamp);
+SapServiceProcessor.processXml(doc,SapServiceProcessor.CUST_MOVE_URL_CALL);
+
+end
+
+rule "If the Customer is in a Regular Department Clothing update visit count"
+no-loop
+when
+CustomerMoveEvent($custId :custId, $location : location, $timestamp : timestamp)
+dept : Department(departmentName == "CLOTHING", $dloc: deptLocation, $dloc.contains( $location ))
+
+custObj :CustomerObj( custId == $custId , deptName == "CLOTHING")
+custMvObj : CustomerMoveObj( custId == $custId)
+
+then
+modify(custObj){setDeptVisitCount(custObj.getDeptVisitCount() + 1), setDeptName(dept.getDepartmentName())};
+modify(custMvObj){setTotalMoves(custMvObj.getTotalMoves() + 1)};
+
+end
+
+rule "If the Customer is in a Regular Department toys update visit count"
+no-loop
+when
+CustomerMoveEvent($custId :custId, $location : location, $timestamp : timestamp)
+dept : Department(departmentName == "TOYS", $dloc: deptLocation, $dloc.contains( $location ))
+
+custObj :CustomerObj( custId == $custId , deptName == "TOYS")
+custMvObj : CustomerMoveObj( custId == $custId)
+
+then
+modify(custObj){setDeptVisitCount(custObj.getDeptVisitCount() + 1), setDeptName(dept.getDepartmentName())};
+modify(custMvObj){setTotalMoves(custMvObj.getTotalMoves() + 1)};
+
+end
+
+rule "If the Customer is in a Regular Department stationary update visit count"
+no-loop
+when
+CustomerMoveEvent($custId :custId, $location : location, $timestamp : timestamp)
+dept : Department(departmentName == "STATIONARY", $dloc: deptLocation, $dloc.contains( $location ))
+
+custObj :CustomerObj( custId == $custId , deptName == "STATIONARY")
+custMvObj : CustomerMoveObj( custId == $custId)
+
+then
+modify(custObj){setDeptVisitCount(custObj.getDeptVisitCount() + 1), setDeptName(dept.getDepartmentName())};
+modify(custMvObj){setTotalMoves(custMvObj.getTotalMoves() + 1)};
+
+end
+
+rule "If the Customer is in a Regular Department jewelry update visit count"
+no-loop
+when
+CustomerMoveEvent($custId :custId, $location : location, $timestamp : timestamp)
+dept : Department(departmentName == "JEWELRY", $dloc: deptLocation, $dloc.contains( $location ))
+
+custObj :CustomerObj( custId == $custId , deptName == "JEWELRY")
+custMvObj : CustomerMoveObj( custId == $custId)
+
+then
+modify(custObj){setDeptVisitCount(custObj.getDeptVisitCount() + 1), setDeptName(dept.getDepartmentName())};
+modify(custMvObj){setTotalMoves(custMvObj.getTotalMoves() + 1)};
+
+end
+
+
+
+rule "If the Customer is in a Regular Department Clothing log only if customer moves more than 3 times"
+
+when
+CustomerMoveEvent($custId :custId, $location : location, $timestamp : timestamp)
+dept : Department(departmentName == "CLOTHING", $dloc: deptLocation, $dloc.contains( $location ))
+
+custObj :CustomerObj( custId == $custId , deptName == "CLOTHING", deptVisitCount == 3)
+then
+
+// call web service api 
+System.out.println("log if customer visit 3 or more times in regular department CLOTHING");
+Document doc = SapServiceProcessor.constructCustomerEntry($custId, DepartmentType.CLOTHING.getDeptId(), $timestamp);
+SapServiceProcessor.processXml(doc,SapServiceProcessor.CUST_ENTRY_URL_CALL);
+end
+
+rule "If the Customer is in a Regular Department Toys log  only if customer moves more than 3 times"
+
+when
+CustomerMoveEvent($custId :custId, $location : location, $timestamp : timestamp)
+custObj :CustomerObj( custId == $custId , deptName == "TOYS", deptVisitCount == 3)
+then
+
+// call web service api 
+System.out.println("regular department toys");
+Document doc = SapServiceProcessor.constructCustomerEntry($custId, DepartmentType.TOYS.getDeptId(), $timestamp);
+SapServiceProcessor.processXml(doc,SapServiceProcessor.CUST_ENTRY_URL_CALL);
+end
+
+rule "If the Customer is in a Regular Department Stationary log  only if customer moves more than 3 times"
+
+when
+CustomerMoveEvent($custId :custId, $location : location, $timestamp : timestamp)
+custObj :CustomerObj( custId == $custId , deptName == "STATIONARY", deptVisitCount == 3)
+then
+
+// call web service api 
+System.out.println("regular department stationary");
+Document doc = SapServiceProcessor.constructCustomerEntry($custId, DepartmentType.STATIONARY.getDeptId(), $timestamp);
+SapServiceProcessor.processXml(doc,SapServiceProcessor.CUST_ENTRY_URL_CALL);
+end
+
+rule "If the Customer is in a Regular Department JEWELRY log  only if customer moves more than 3 times"
+
+when
+CustomerMoveEvent($custId :custId, $location : location, $timestamp : timestamp)
+custObj :CustomerObj( custId == $custId , deptName == "JEWELRY", deptVisitCount == 3)
+then
+
+// call web service api 
+System.out.println("regular department JEWELRY");
+Document doc = SapServiceProcessor.constructCustomerEntry($custId, DepartmentType.JEWELRY.getDeptId(), $timestamp);
+SapServiceProcessor.processXml(doc,SapServiceProcessor.CUST_ENTRY_URL_CALL);
+end
+
+rule "Customer is a fast moving customer"
+
+when
+CustomerMoveEvent($custId :custId, $location : location, $timestamp : timestamp)
+custMvObj :CustomerMoveObj( custId == $custId , totalMoves == 10)
+then
+
+// call web service api 
+System.out.println("customer classification is focused fast moving customer");
+Document doc = SapServiceProcessor.constructCustomerClass($custId, 2 , $timestamp);
+SapServiceProcessor.processXml(doc,SapServiceProcessor.CUST_CLASS_URL_CALL);
+end
+
+rule "Customer is a browsing customer"
+
+when
+CustomerMoveEvent($custId :custId, $location : location, $timestamp : timestamp)
+custMvObj :CustomerMoveObj( custId == $custId , totalMoves == 20)
+then
+
+// call web service api 
+System.out.println("customer classification is a browsing customer");
+Document doc = SapServiceProcessor.constructCustomerClass($custId, 1 , $timestamp);
+SapServiceProcessor.processXml(doc,SapServiceProcessor.CUST_CLASS_URL_CALL);
+end
+

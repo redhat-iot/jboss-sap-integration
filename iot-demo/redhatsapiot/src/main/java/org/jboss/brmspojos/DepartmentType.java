@@ -7,16 +7,25 @@ package org.jboss.brmspojos;
  */
 public enum DepartmentType {
 	
-	PHARMACY ("special"),
-	FOOD ("special"),
-	CLOTHING ("regular"),
-	TOYS ("regular"),
-	BOOKS ("regular");
+	PHARMACY (0),
+	FOOD (1),
+	CLOTHING (2),
+	TOYS (3),
+	STATIONARY (4),
+	JEWELRY(5);
 	
-	private String deptType;
+	private Integer deptId;
 	
-	private DepartmentType(String deptType) {
-		this.deptType = deptType;
+	private DepartmentType(Integer deptId) {
+		this.setDeptId(deptId);
+	}
+
+	public Integer getDeptId() {
+		return deptId;
+	}
+
+	public void setDeptId(Integer deptId) {
+		this.deptId = deptId;
 	}
 
 }

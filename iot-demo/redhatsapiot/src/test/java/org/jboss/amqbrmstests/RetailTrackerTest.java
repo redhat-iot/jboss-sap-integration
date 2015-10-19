@@ -58,8 +58,8 @@ public class RetailTrackerTest {
 
 	}
 
-	@Test
-	public void testCustomerInDepartment() {
+	
+	/*public void testCustomerInDepartment() {
 		System.out
 				.println("** Check if customer is in a department with 3 moves and designate as entered **");
 
@@ -87,6 +87,6 @@ public class RetailTrackerTest {
 		kSession.insert(dept);
 		kSession.fireAllRules();
 		System.out.println("* Transaction Completed: ");
-	}
+	}*/
 
 }

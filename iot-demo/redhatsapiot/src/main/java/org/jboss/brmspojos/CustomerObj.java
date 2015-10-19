@@ -10,27 +10,32 @@ import java.awt.Point;
 public class CustomerObj {
 	 
 	public CustomerObj(String custId, long timestamp, Integer classification,
-			Point location, Department department) {
+			Point location, String deptName) {
 		super();
 		this.custId = custId;
+		this.location = location;
 		this.timestamp = timestamp;
 		this.classification = classification;
-		this.location = location;
-		this.department = department;
+		this.deptName = deptName;
+		this.messageSent = false;
 	}
 	
-	public CustomerObj(String custId, Point location) {
+	public CustomerObj(String custId, Point location, long timestamp, Integer classification, String deptName) {
 		super();
 		this.custId = custId;
 		this.location = location;
+		this.timestamp = timestamp;
+		this.classification = classification;
+		this.deptName = deptName;
 	}
 	
 	private String custId;
 	private long timestamp;
 	private Integer classification;
 	private Point location;
-	private Department department;
+	private String deptName;
 	private Integer deptVisitCount;
+	private boolean messageSent;
 	
 	
 	public long getTimestamp() {
@@ -57,12 +62,6 @@ public class CustomerObj {
 	public void setLocation(Point location) {
 		this.location = location;
 	}
-	public Department getDepartment() {
-		return department;
-	}
-	public void setDepartment(Department department) {
-		this.department = department;
-	}
 
 	public Integer getDeptVisitCount() {
 		if (deptVisitCount == null)
@@ -73,6 +72,22 @@ public class CustomerObj {
 
 	public void setDeptVisitCount(Integer deptVisitCount) {
 		this.deptVisitCount = deptVisitCount;
+	}
+
+	public String getDeptName() {
+		return deptName;
+	}
+
+	public void setDeptName(String deptName) {
+		this.deptName = deptName;
+	}
+
+	public boolean isMessageSent() {
+		return messageSent;
+	}
+
+	public void setMessageSent(boolean messageSent) {
+		this.messageSent = messageSent;
 	}
 	
 

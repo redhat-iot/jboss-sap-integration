@@ -106,13 +106,13 @@ def main():
       if c.tick():
          if c.isExiting and c.currentLocation.x == 0 and c.currentLocation.y == 0:
             # remove the customer and signal the exit
-            msg = {'id': str(c.id), 'ts': int(datetime.datetime.now().strftime("%s"))}
+            msg = {'id': str(c.id), 'ts': int(datetime.datetime.now().strftime("%s"))*1000}
             mqttc.publish("customerexit", json.dumps(msg))
             print('Customer is Exiting: %s') % (c.id)
             customerQueue.remove(c)
          else:
             # signal move
- 	    msg = {'id': str(c.id), 'ts': int(datetime.datetime.now().strftime("%s")), 'x': c.currentLocation.x, 'y': c.currentLocation.y}
+ 	    msg = {'id': str(c.id), 'ts': int(datetime.datetime.now().strftime("%s"))*1000, 'x': c.currentLocation.x, 'y': c.currentLocation.y}
             print('Customer is Moving: %s') % (msg)
             mqttc.publish("customermove", json.dumps(msg))
 
@@ -123,7 +123,7 @@ def main():
          newCustomer = Customer(myStore)
          customerQueue.append(newCustomer)
 
-         msg = {'id': str(newCustomer.id), 'ts': int(datetime.datetime.now().strftime("%s"))}
+         msg = {'id': str(newCustomer.id), 'ts': int(datetime.datetime.now().strftime("%s"))*1000}
          mqttc.publish("customerenter", json.dumps(msg))
 
          nextCustomerEntranceTime = datetime.datetime.now() + datetime.timedelta(0, random.uniform(1, 600 / averageCustomersInStore))
