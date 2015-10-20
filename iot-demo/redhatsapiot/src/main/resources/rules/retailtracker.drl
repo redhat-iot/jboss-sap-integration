@@ -264,7 +264,7 @@ rule "Customer is a fast moving customer"
 
 when
 CustomerMoveEvent($custId :custId, $location : location, $timestamp : timestamp)
-custMvObj :CustomerMoveObj( custId == $custId , totalMoves == 10)
+custMvObj :CustomerMoveObj( custId == $custId , totalMoves == 1)
 then
 
 // call web service api 
@@ -279,7 +279,7 @@ rule "Customer is a browsing customer"
 
 when
 CustomerMoveEvent($custId :custId, $location : location, $timestamp : timestamp)
-custMvObj :CustomerMoveObj( custId == $custId , totalMoves == 20)
+custMvObj :CustomerMoveObj( custId == $custId , totalMoves == 1)
 then
 
 // call web service api 
