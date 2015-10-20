@@ -52,10 +52,13 @@ The global_database_id must be unique for each databaes that is created. If you 
 
 - Build and install the BRMS rules engine.
 
-- Install and run the HTML5 web UI to view the customer activity.
+- Install and run the HTML5 web UI to view customer activity in the store.
   - In the gui/customer-tracker project, run "mvn clean install" from the command line to build the war.
   - Deploy to a local JBoss EAP server.
-  - The web page is available at http://locahost:8080/customer-tracker/
+  - Install node.js and run "node subscribe.js" from jboss-sap-integration/iot-demo/gui/customer-tracker/src/main/webapp/js. 
+  - The web application will be available at http://localhost:8080/customer-tracker/
+  - Customers will display and move around the store using the coordinates provided by messages from A-MQ. BRMS will detect customers that may need assistance due to focused attention to a single department or excessive browsing and send messages to alert salespersons.
+ 
  
   
   
