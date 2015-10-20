@@ -3,6 +3,12 @@
 <head>
 <meta charset="UTF-8"/>
 <title>IoT Demo</title>
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;margin:0px auto;}
+.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:none;border-width:0px;overflow:hidden;word-break:normal;}
+.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;}
+.tg .tg-yw4l{vertical-align:top}
+</style>
 <script type="text/javascript" src="js/jquery-1.8.3.js"></script>
 <script type="text/javascript" src="js/socket.io.js"></script>
 </head>
@@ -114,12 +120,24 @@
     
 </script>
 <body>
-<h1>Red Hat/SAP IoT Demo</h1>
-<div id="body_content">
+<table class="tg" >
+  <tr>
+    <td class="tg-yw4l" colspan="2"   bgcolor="#99CCFF">
+    <table class="tg">
+  		<tr><td class="tg-yw4l"  align="center" colspan="2"><img src="images/sap.png" alt="SAP"></td></tr>
+      	<tr><td class="tg-yw4l"  align="center" colspan="2"><img src="images/redhat.png" alt="Red Hat"></td></tr>
+ 	</table>
+  <tr>
+    <td class="tg-yw4l" align="center" colspan="2"><h1>Retail Store IoT Demo</h1></td>
+  </tr>
+  <tr>
+    <td class="tg-yw4l" colspan="2"><div id="body_content">
 <canvas id="canvas" width=500px height=300px style="background: url('images/retail.gif'); 	background-size: 500px 300px; background-repeat: no-repeat;">
 Your browser does not support HMTL5 canvas.
 </canvas>
-</div>
+</div></td>
+  </tr>
+</table>
 </body>
 </html>
 
