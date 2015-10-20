@@ -1,7 +1,3 @@
-/**
- * 
- */
-
 var sys = require('sys');
 var net = require('net');
 var mqtt = require('mqtt');
@@ -9,17 +5,18 @@ var mqtt = require('mqtt');
 var io  = require('socket.io').listen(5000);
 io.set('origins', '*:*');
 
-var client = new mqtt.MQTTClient(1883, 'localhost', 'pusher');
- 
+var client = mqtt.connect("mqtt://admin:admin@localhost:1883");
+
 io.sockets.on('connection', function (socket) {
   socket.on('subscribe', function (data) {
     console.log('Subscribing to '+data.topic);
+    socket.join(data.topic);
     client.subscribe(data.topic);
   });
 });
- 
-client.addListener('mqttData', function(topic, payload){
-  sys.puts(topic+'='+payload);
-  io.sockets.emit('mqtt',{'topic':String(topic),
-    'payload':String(payload)});
-});
+
+client.on('message', function(topic, message) {
+	  console.log(message);
+	  sys.puts(topic+'='+message);
+	  io.sockets.in(topic).emit('mqtt',{'topic': String(topic), 'payload':String(message)});
+	});
