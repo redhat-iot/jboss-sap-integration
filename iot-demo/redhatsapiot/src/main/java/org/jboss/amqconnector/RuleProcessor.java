@@ -42,12 +42,13 @@ public class RuleProcessor {
 
 	public static KieSession insertDepartments() {
 
-		Rectangle deptLocationOne = new Rectangle(1, 2, 3, 5);
-		Rectangle deptLocationTwo = new Rectangle(2, 3, 2, 4);
-		Rectangle deptLocationThree = new Rectangle(3, 4, 5, 4);
-		Rectangle deptLocationFour = new Rectangle(4, 4, 3, 5);
-		Rectangle deptLocationFive = new Rectangle(5, 5, 2, 4);
-		Rectangle deptLocationSix = new Rectangle(4, 2, 2, 4);
+		Rectangle deptLocationOne = new Rectangle(0, 1, 1, 2);
+		Rectangle deptLocationTwo = new Rectangle(1, 2, 3, 5);
+		Rectangle deptLocationThree = new Rectangle(2, 3, 2, 4);
+		Rectangle deptLocationFour = new Rectangle(3, 4, 5, 4);
+		Rectangle deptLocationFive = new Rectangle(4, 4, 3, 5);
+		Rectangle deptLocationSix = new Rectangle(5, 4, 2, 4);
+		
        
 		 
 		Department deptOne = new Department("PHARMACY", deptLocationOne,
