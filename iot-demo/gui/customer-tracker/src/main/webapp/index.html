@@ -13,7 +13,7 @@
       socket.on('mqtt', function (msg) {
     	  updatePage(msg.topic, msg.payload);
     	  if (msg.topic=="salesnotification"){
-    		  sendAlert(msg.payload);
+    		  sendAlert(msg.topic, msg.payload);
     	  }
      });
      socket.emit('subscribe',{topic:'salesnotification'});
@@ -27,7 +27,7 @@
     	var x = obj['x'];
     	var y = obj['y'];
     	
-    	customAlert("Customer "+id+" may need assistance at x="+x+"y="+y,"15000");
+    	customAlert("Customer "+id+" may need assistance at x="+x+",y="+y,"15000");
     	
     }
     
