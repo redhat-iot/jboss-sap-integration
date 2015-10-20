@@ -47,28 +47,34 @@
 		    topic=="customerexit"){
 			
 			var parsed_payload = JSON.parse(JSON.stringify(payload.substring(payload.indexOf("{",0))));
-			var m = new Map();
-			if (sessionStorage.getItem['customers'] != null){
-				m = sessionStorage.getItem['customers'];
-			}
 			
-			var key = getKey(parsed_payload);			
+			var key = getKey(parsed_payload);
+			
 			//Delete from map if the customer has left the store
 			if ( topic=="customerexit") {
-			    m.delete(getCustomerExitingKey(parsed_payload));
+				var exit_key = getCustomerExitingKey(parsed_payload);
+				localStorage.removeItem(exit_key);
 			}else{
-				m.set(key,parsed_payload);
+				localStorage.setItem(key,parsed_payload);
 			}
-			
-			sessionStorage.setItem('customers', m);
 			
 			//document.body.innerHTML = '';
 			//get a reference to the canvas
 			var canvas=document.getElementById('canvas');
 			var ctx = canvas.getContext('2d');
-		
-			m.forEach(function (item, key, mapObj) {
-				var obj = JSON.parse(JSON.stringify(item));
+			// Store the current transformation matrix
+			ctx.save();
+
+			// Use the identity matrix while clearing the canvas
+			ctx.setTransform(1, 0, 0, 1, 0, 0);
+			ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+			// Restore the transform
+			ctx.restore();
+
+			for (var i = 0; i < localStorage.length; i++){
+			    var item = localStorage.getItem(localStorage.key(i));
+			    var obj = JSON.parse(JSON.stringify(item));
 				var x = getX(obj);
 				var y = getY(obj);	
 
@@ -77,8 +83,7 @@
 				ctx.arc(Number(x)+getRandomInt(10, 450), Number(y)+getRandomInt(10, 250), 5, 0, Math.PI*2, true); 
 				ctx.closePath();
 				ctx.fill();
-				
-			});
+			}
 			
 			function getKey(payload){
 				return parsed_payload.substring(parsed_payload.indexOf("'id': ")+6, parsed_payload.indexOf(", 'ts'"));
