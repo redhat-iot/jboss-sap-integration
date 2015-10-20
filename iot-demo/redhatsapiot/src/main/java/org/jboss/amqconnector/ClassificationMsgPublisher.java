@@ -37,7 +37,7 @@ public class ClassificationMsgPublisher implements MqttCallback{
 	IOException {
     try {
 	 
-	clientSender= new MqttClient("tcp://localhost:1883", "Receiver");
+	clientSender= new MqttClient("tcp://localhost:1883", "ClassReceiver");
 
 	connOpt = new MqttConnectOptions();
 	connOpt.setCleanSession(true);
