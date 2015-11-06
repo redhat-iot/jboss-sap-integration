@@ -29,7 +29,7 @@ public class ClassificationMsgPublisher implements MqttCallback{
 	public static void main(String[] args) throws InterruptedException,
 	 IOException {
     long startTime = System.currentTimeMillis();
-    new ClassificationMsgPublisher().doDemo("test_1_2_3", new Point(2,3), 1122323232, "focussed customer");
+    new ClassificationMsgPublisher().doDemo("test_1_2_3", new Point(2,3), 1122323232, "focused customer");
     long endTime = System.currentTimeMillis();
     }
 
@@ -65,7 +65,7 @@ public class ClassificationMsgPublisher implements MqttCallback{
 	 clientSender.close();
 
      } catch (MqttException e) {
-	     System.out.println("ERROR");
+	     System.out.println("ERROR:"+ e.getLocalizedMessage());
      }
      }
 

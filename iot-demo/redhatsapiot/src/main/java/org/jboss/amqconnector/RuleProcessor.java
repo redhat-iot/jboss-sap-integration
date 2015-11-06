@@ -84,7 +84,7 @@ public class RuleProcessor {
         String jsonString = null;
        
         
-		if (message.contains("Customer is Moving")) {
+		if (message.contains("Moving")) {
 			jsonString = message.substring(
 					message.indexOf(": ") + 2, message.length());
 			JSONObject obj = new JSONObject(jsonString);
@@ -146,7 +146,7 @@ public class RuleProcessor {
         for (String message : testStrings) {
         	
         
-		if (message.contains("Customer is Moving")) {
+		if (message.contains("Moving")) {
 			jsonString = message.substring(
 					message.indexOf(": ") + 2, message.length());
 

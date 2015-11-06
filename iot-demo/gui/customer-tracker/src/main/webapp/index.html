@@ -17,15 +17,30 @@
   var socket = io.connect('http://localhost:5000');
     socket.on('connect', function () {
       socket.on('mqtt', function (msg) {
-    	  updatePage(msg.topic, msg.payload);
     	  if (msg.topic=="salesnotification"){
-    		  sendAlert(msg.topic, msg.payload);
+    		sendAlert(msg.topic, msg.payload);
+    		updatePage(msg.topic, msg.payload);
+    	  }else{
+    	  	updatePage(msg.topic, msg.payload);
     	  }
+    	  
      });
      socket.emit('subscribe',{topic:'salesnotification'});
      socket.emit('subscribe',{topic:'customermove'});
      socket.emit('subscribe',{topic:'customerexit'});
     });
+    
+    var intervalID = window.setInterval(removeAlerts, 600000);
+
+    function removeAlerts() {
+    	for (var i = 0; i < sessionStorage.length; i++){
+			var key = sessionStorage.key(i);
+		    key = JSON.parse(JSON.stringify(key))
+		    if (key.indexOf("alert")==0){
+		    	sessionStorage.removeItem(key);
+		    }
+		}
+    }
     
     function sendAlert(topic, payload) {
     	var obj = JSON.parse(payload);
@@ -33,20 +48,24 @@
     	var x = obj['x'];
     	var y = obj['y'];
     	
+    	var parsed_payload = JSON.parse(JSON.stringify(payload.substring(payload.indexOf("{",0))));
+    	
+    	sessionStorage.setItem("alert:"+id, parsed_payload);
+    	
     	customAlert("Customer "+id+" may need assistance at x="+x+",y="+y,"15000");
     	
     }
     
     function customAlert(msg,duration) {
 	     var styler = document.createElement("div");
-	     styler.setAttribute("style","border: solid 5px Red;width:auto;height:auto;top:50%;left:40%;background-color:#444;color:Silver");
-	     styler.innerHTML = "<h1>"+msg+"</h1>";
+	     styler.setAttribute("style","border: solid 2px Red;width:auto;height:auto;top:50%;left:40%;background-color:#444;color:Silver");
+	     styler.innerHTML = "<h4>"+msg+"</h4>";
 	     setTimeout(function()
 	     {
-	       styler.parentNode.removeChild(styler);
+	       document.getElementById("alerts").removeChild(styler);	 
 	     },duration);
-	     document.body.appendChild(styler);
-    }
+	     document.getElementById("alerts").appendChild(styler);
+   }
     
 	function updatePage(topic, payload) {
 		if (topic=="customermove"  ||
@@ -56,88 +75,116 @@
 			
 			var key = getKey(parsed_payload);
 			
-			//Delete from map if the customer has left the store
-			if ( topic=="customerexit") {
-				var exit_key = getCustomerExitingKey(parsed_payload);
-				localStorage.removeItem(exit_key);
-			}else{
-				localStorage.setItem(key,parsed_payload);
-			}
-			
 			//document.body.innerHTML = '';
 			//get a reference to the canvas
 			var canvas=document.getElementById('canvas');
 			var ctx = canvas.getContext('2d');
 			// Store the current transformation matrix
-			ctx.save();
-
-			// Use the identity matrix while clearing the canvas
-			ctx.setTransform(1, 0, 0, 1, 0, 0);
-			ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-			// Restore the transform
-			ctx.restore();
-
-			for (var i = 0; i < localStorage.length; i++){
-			    var item = localStorage.getItem(localStorage.key(i));
-			    var obj = JSON.parse(JSON.stringify(item));
-				var x = getX(obj);
-				var y = getY(obj);	
-
-				//draw a circle
-				ctx.beginPath();
-				ctx.arc(Number(x)+getRandomInt(10, 450), Number(y)+getRandomInt(10, 250), 5, 0, Math.PI*2, true); 
-				ctx.closePath();
-				ctx.fill();
+			// ctx.save();
+			
+			//Delete from map if the customer has left the store
+			if ( topic=="customerexit") {
+				var exit_key = getCustomerExitingKey(parsed_payload);
+				sessionStorage.removeItem(exit_key);
+				return;
+			}else{
+				sessionStorage.setItem(key,parsed_payload);
 			}
 			
+		    ctx.clearRect(0, 0, canvas.width, canvas.height);
+			
+			var radius = 5;
+
+			for (var i = 0; i < sessionStorage.length; i++){
+				var key = sessionStorage.key(i);
+			    var item = sessionStorage.getItem(key);
+			    var obj = JSON.parse(JSON.stringify(item));
+			    var color="green";
+			    
+			    key = JSON.parse(JSON.stringify(key))
+			    if (key.indexOf("alert")==0){
+			    	color="red";
+			    	//sessionStorage.removeItem(key);
+			    	var x = JSON.parse(item)["x"]; 
+					var y = JSON.parse(item)["y"];
+			    }else{
+			    	var x = getX(obj);
+					var y = getX(obj);
+			    }
+				
+				//draw a circle
+				ctx.beginPath();
+				ctx.arc(Number(x), Number(y), radius, 0, Math.PI*2, true); 
+				ctx.fillStyle = color;
+				ctx.fill();
+				
+			}
+			
+			
 			function getKey(payload){
-				return parsed_payload.substring(parsed_payload.indexOf("'id': ")+6, parsed_payload.indexOf(", 'ts'"));
+				return payload.substring(payload.indexOf("'id': ")+6, payload.indexOf(", 'ts'"));
 			}
 			
 			function getCustomerExitingKey(payload){
-				return parsed_payload.substring(parsed_payload.indexOf(": ")+2);
+				return payload.substring(payload.indexOf(": ")+2, payload.indexOf(", 'ts'"));
 			}
 			
 			function getX(payload){
-				return parsed_payload.substring(parsed_payload.indexOf("'x': ")+4, parsed_payload.indexOf(", 'id'")).trim();
+				return payload.substring(payload.indexOf("'x':")+4, payload.indexOf(", 'id'")).trim();
 			}
 			
 			function getY(payload){
-				return parsed_payload.substring(parsed_payload.indexOf("'y': ")+4, parsed_payload.indexOf(", 'x'")).trim();
+				return payload.substring(payload.indexOf("'y':")+4, payload.indexOf(", 'x'")).trim();
 			}
 			
-			/**
-			 * Returns a random integer between min (inclusive) and max (inclusive)
-			 * Using Math.round() will give you a non-uniform distribution!
-			 */
-			function getRandomInt(min, max) {
-			    return Math.floor(Math.random() * (max - min + 1)) + min;
+			function getAlertX(payload){
+				return payload.substring(payload.indexOf("'x':")+5, payload.indexOf(".0,")).trim();
 			}
-
+			
+			function getAlertY(payload){
+				return payload.substring(payload.indexOf("'y':")+5, payload.indexOf(".0,\"id\"")).trim();
+			}
+			
 		}
 }
     
 </script>
 <body>
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:none;border-width:1px;overflow:hidden;word-break:normal;}
+.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;}
+.tg .tg-yw4l{vertical-align:top}
+</style>
 <table class="tg" >
   <tr>
-    <td class="tg-yw4l" colspan="2"   bgcolor="#99CCFF">
-    <table class="tg">
-  		<tr><td class="tg-yw4l"  align="center" colspan="2"><img src="images/sap.png" alt="SAP"></td></tr>
-      	<tr><td class="tg-yw4l"  align="center" colspan="2"><img src="images/redhat.png" alt="Red Hat"></td></tr>
- 	</table>
+  <td class="tg-yw4l" colspan="1"   bgcolor="#99CCFF">
+	<table class="tg" >
+	  <tr>
+	    <td class="tg-yw4l" colspan="2"   bgcolor="#99CCFF">
+	    <table class="tg">
+	  		<tr><td class="tg-yw4l"  align="center" colspan="2"><img src="images/sap.png" alt="SAP"></td></tr>
+	      	<tr><td class="tg-yw4l"  align="center" colspan="2"><img src="images/redhat.png" alt="Red Hat"></td></tr>
+	 	</table>
+	  <tr>
+	    <td class="tg-yw4l" align="center" colspan="2"><h1>Retail Store IoT Demo</h1></td>
+	  </tr>
+	  <tr>
+	    <td class="tg-yw4l" colspan="2"><div id="body_content">
+	<canvas id="canvas" width=500px height=300px style="background: url('images/retail.gif'); 	background-size: 500px 300px; background-repeat: no-repeat;">
+	Your browser does not support HMTL5 canvas.
+	</canvas>
+	</div></td>
+	  </tr>
+	</table>
+  <td class="tg-yw4l" colspan="1"  height="500" width="500"  bgcolor="#F0F8FF" align="center"><h2>Alerts</h2>
+  <table class="tg" >
   <tr>
-    <td class="tg-yw4l" align="center" colspan="2"><h1>Retail Store IoT Demo</h1></td>
-  </tr>
-  <tr>
-    <td class="tg-yw4l" colspan="2"><div id="body_content">
-<canvas id="canvas" width=500px height=300px style="background: url('images/retail.gif'); 	background-size: 500px 300px; background-repeat: no-repeat;">
-Your browser does not support HMTL5 canvas.
-</canvas>
-</div></td>
+  <td class="tg-yw4l" colspan="1" height="500"  width="500"  bgcolor="#FFFFFF"  id="alerts">
+  </td>
   </tr>
 </table>
+
 </body>
 </html>
 

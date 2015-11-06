@@ -1,14 +1,17 @@
 package org.jboss.amqconnector;
 
+import java.awt.Point;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.MqttClient;
+import org.json.JSONObject;
 
 /**
  * 
@@ -19,6 +22,8 @@ public class MsgPublisher implements MqttCallback {
 
 	MqttClient clientSender;
 	MqttClient clientReceiver;
+	
+	//MqttClient clientClassPublish;
 	MqttConnectOptions connOpt;
 
 	public MsgPublisher() {
@@ -34,8 +39,10 @@ public class MsgPublisher implements MqttCallback {
 	public void doDemo() throws InterruptedException,
 			IOException {
 		try {
+			int i = 0;
 			clientSender = new MqttClient("tcp://localhost:1883", "Sender");
 			clientReceiver = new MqttClient("tcp://localhost:1883", "Receiver");
+		//	clientClassPublish = new MqttClient("tcp://localhost:1883", "ClassRec");
 
 			connOpt = new MqttConnectOptions();
 			connOpt.setCleanSession(true);
@@ -52,7 +59,7 @@ public class MsgPublisher implements MqttCallback {
 			clientReceiver.subscribe("customerexit");
 			clientReceiver.setCallback(this);
 
-			Process p = Runtime.getRuntime().exec("python custsimulator.py");
+			Process p = Runtime.getRuntime().exec("python custsim.py");
 			// StringWriter writer = new StringWriter(); //ouput will be stored
 			// here
 
@@ -71,10 +78,25 @@ public class MsgPublisher implements MqttCallback {
 				if (output.contains("New Customer")) {
 					clientSender.publish("customerenter", message);
 
-				} else if (output.contains("Customer is Moving")) {
-					clientSender.publish("customermove", message);
+				} else if (output.contains("Moving")) {
+					if (i % 200 == 0) {
+						String jsonString = null;
+						jsonString = output.substring(
+								output.indexOf(": ") + 2, output.length());
+						JSONObject obj = new JSONObject(jsonString);
 
-				} else if (output.contains("Customer is Exiting")) {
+						int x = obj.getInt("x");
+						int y = obj.getInt("y");
+						String id = obj.getString("id");
+						long timestamp = obj.getLong("ts");
+						Point pt = new Point(x, y);
+						ClassificationMsgPublisher.doDemo(id, pt, timestamp, "focused customer");
+					}
+					
+					clientSender.publish("customermove", message);
+					
+
+				} else if (output.contains("Exiting")) {
 					clientSender.publish("customerexit", message);
 
 				}
@@ -108,6 +130,7 @@ public class MsgPublisher implements MqttCallback {
 		 // Entry Point to invoke rules
 		RuleProcessor.invokeRules(msg);
 	}
+	
 
 	public void deliveryComplete(IMqttDeliveryToken token) {
 
