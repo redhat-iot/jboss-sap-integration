@@ -10,8 +10,7 @@ AMQ_HOME=$DEMO_HOME/$AMQ
 SERVER_CONF=$AMQ_HOME/etc
 SERVER_BIN=$AMQ_HOME/bin
 SRC_DIR=./installs
-PRJ_DIR=./projects/amqp-example-web
-PRJ2_DIR=./projects/mqtt-drools
+PRJ_DIR=./gui/customer-tracker
 # wipe screen.
 clear 
 
@@ -104,16 +103,10 @@ echo
 cd $PRJ_DIR
 mvn clean install -DskipTests
 
-echo Now going to build the project.      
-echo                                      
-cd $PRJ2_DIR                               
-mvn clean install -DskipTests             
-
-
 echo
 echo You have two steps to start the demo:
 echo
-echo "First you can start the WEB Dashboard in $PRJ_DIR by executing 'mvn jetty:run'"
+echo "First you can start the HTML5 Retail Dashboard in $PRJ_DIR by executing 'mvn jetty:run'"
 echo
 echo "Then you need to start the $PRODUCT with $SERVER_BIN/amq"
 echo
