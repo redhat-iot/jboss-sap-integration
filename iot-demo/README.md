@@ -22,7 +22,9 @@ Install socket.io (node.js)
 
 Install mqtt (node.js)
 - https://www.npmjs.com/package/mqtt
-   
+
+Install Maven
+- https://maven.apache.org/install.html
 
 Setup and Configuration
 -----------------------
