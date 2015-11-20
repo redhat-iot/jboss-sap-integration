@@ -22,7 +22,9 @@ Install socket.io (node.js)
 
 Install mqtt (node.js)
 - https://www.npmjs.com/package/mqtt
-   
+
+Install Maven
+- https://maven.apache.org/install.html
 
 Setup and Configuration
 -----------------------
@@ -74,11 +76,7 @@ The global_database_id must be unique for each databaes that is created. If you 
   - Run "node subscribe.js" from jboss-sap-integration/iot-demo/gui/customer-tracker/src/main/webapp/js. 
   - The web application will be available at http://localhost:8080/customer-tracker/
   - Customers will display and move around the store using the coordinates provided by messages from A-MQ. BRMS will detect customers that may need assistance due to focused attention to a single department or excessive browsing and send messages to alert salespersons.
- 
- 
-  
-  
->>>>>>> Stashed changes
+
 
 Supporting Articles
 -------------------

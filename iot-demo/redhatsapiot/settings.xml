@@ -43,4 +43,8 @@
   
   <activeProfile>repo-eclipse</activeProfile>
   </activeProfiles>
+  <pluginGroups>
+  <pluginGroup>org.mortbay.jetty</pluginGroup>
+</pluginGroups>
+  
 </settings>
