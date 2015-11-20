@@ -5,13 +5,13 @@
 	<artifactId>redhatsapdemo</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>RedHatSapIoT</name>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.kie</groupId>
 			<artifactId>kie-api</artifactId>
 			<version>6.2.0.Final</version>
 		</dependency>
-
 		<dependency>
 			<groupId>org.drools</groupId>
 			<artifactId>drools-core</artifactId>
@@ -53,12 +53,39 @@
 			<artifactId>httpclient</artifactId>
 			<version>4.5</version>
 		</dependency>
-		 <dependency>
-	<groupId>com.googlecode.json-simple</groupId>
-	<artifactId>json-simple</artifactId>
-	<version>1.1.1</version>
-</dependency>
-		 
-
+		<dependency>
+			<groupId>com.googlecode.json-simple</groupId>
+			<artifactId>json-simple</artifactId>
+			<version>1.1.1</version>
+		</dependency>
 	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<configuration>
+					<descriptors>
+						<descriptor>src/assembly/uberjar.xml</descriptor>
+					</descriptors>
+					<archive>
+						<manifest>
+							<mainClass>org.jboss.amqconnector.MsgPublisher</mainClass>
+							<addClasspath>true</addClasspath>
+						</manifest>
+					</archive>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
 </project>
