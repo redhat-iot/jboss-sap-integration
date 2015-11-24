@@ -71,9 +71,10 @@ The global_database_id must be unique for each databaes that is created. If you 
 - From the redhatsapiot directory, run java -jar target/redhatsapdemo-0.0.1-SNAPSHOT-uberjar.jar 
 
 - Install and run the HTML5 web UI to view customer activity in the store.
-  - In the gui/customer-tracker project, run "mvn clean install jetty:run" from the command line to build the war.
+  - In the gui/customer-tracker project, run "mvn jetty:run -s ../../redhatsapiot/settings.xml
+" from the command line to build the war.
   - Run "node subscribe.js" from jboss-sap-integration/iot-demo/gui/customer-tracker/src/main/webapp/js. 
-  - The web application will be available at http://localhost:8080/customer-tracker/
+  - The web application will be available at http://localhost:8080/
   - Customers will display and move around the store using the coordinates provided by messages from A-MQ. BRMS will detect customers that may need assistance due to focused attention to a single department or excessive browsing and send messages to alert salespersons.
 
 
