@@ -37,9 +37,6 @@ Setup and Configuration
 
    go to ./target/jboss-a-mq-{$version}/bin
    execute JBoss A-MQ by executing ./amq
-   
-
-- Generate fake customer data by either running generatefakedata.py *or* use the included customers.dat.example file by renaming it to customer.dat. Copy the customer.dat file into the custsim directory.
 
 - Run the custsim.py sript
 
