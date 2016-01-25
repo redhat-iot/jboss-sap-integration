@@ -59,11 +59,7 @@ The global_database_id must be unique for each databaes that is created. If you 
 
   - dbisql -c "uid=dba;pwd=sqlsql" "SET OPTION PUBLIC.global_database_id = XX"
 
-  - Initially, the remote database does not have any data in it. To get the initial data you must peform a sync. Run:
-
-  - ./sync.sh
-
-- From now on, run the sync script any time you want to upload new data
+- Update your HANA DB using the DDL in the /persistance folder
 
 - From the redhatsapiot directory, run java -jar target/redhatsapdemo-0.0.1-SNAPSHOT-uberjar.jar 
 
@@ -72,6 +68,11 @@ The global_database_id must be unique for each databaes that is created. If you 
   - Run "node subscribe.js" from jboss-sap-integration/iot-demo-jdv/gui/customer-tracker/src/main/webapp/js. 
   - The web application will be available at http://localhost:8080/customer-tracker/
   - Customers will display and move around the store using the coordinates provided by messages from A-MQ. BRMS will detect customers that may need assistance due to focused attention to a single department or excessive browsing and send messages to alert salespersons.
+
+  - Model your sources in Teiid Designer
+  -   HANA import
+  -   SQLAnywhere import
+  -   Federated View
 
 
 Supporting Articles
@@ -86,7 +87,7 @@ Released versions
 See the tagged releases for the following versions of the product:
 
 - v0.1 - JBoss A-MQ 6.2.
-- v0.1 - JBoss Data Virtulaization 6.2
+- v0.1 - JBoss Data Virtualization 6.2
 
 
 
