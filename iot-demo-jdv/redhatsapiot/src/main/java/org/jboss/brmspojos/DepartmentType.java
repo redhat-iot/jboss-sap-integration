@@ -7,12 +7,12 @@ package org.jboss.brmspojos;
  */
 public enum DepartmentType {
 	
-	PHARMACY (0),
-	FOOD (1),
-	CLOTHING (2),
-	TOYS (3),
-	STATIONARY (4),
-	JEWELRY(5);
+	MENS (0),
+	FORMAL (1),
+	BOYS (2),
+	WOMANS (3),
+	GIRLS (4),
+	SPORTWEAR(5);
 	
 	private Integer deptId;
 	
