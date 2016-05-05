@@ -51,18 +51,18 @@ public class RuleProcessor {
 		
        
 		 
-		Department deptOne = new Department("PHARMACY", deptLocationOne,
+		Department deptOne = new Department("MENS", deptLocationOne,
+				Department.REGULAR);
+		Department deptTwo = new Department("FORMAL", deptLocationTwo,
 				Department.SPECIAL);
-		Department deptTwo = new Department("FOOD", deptLocationTwo,
+		Department deptThree = new Department("BOYS", deptLocationThree,
+				Department.REGULAR);
+		Department deptFour = new Department("WOMAN", deptLocationFour,
+				Department.REGULAR);
+		Department deptFive = new Department("GIRLS", deptLocationFive,
+				Department.REGULAR);
+		Department deptSix = new Department("SPORTWEAR", deptLocationSix,
 				Department.SPECIAL);
-		Department deptThree = new Department("CLOTHING", deptLocationThree,
-				Department.REGULAR);
-		Department deptFour = new Department("TOYS", deptLocationFour,
-				Department.REGULAR);
-		Department deptFive = new Department("STATIONARY", deptLocationFive,
-				Department.REGULAR);
-		Department deptSix = new Department("JEWELRY", deptLocationSix,
-				Department.REGULAR);
 
 		kSession.insert(deptOne);
 		kSession.insert(deptTwo);
