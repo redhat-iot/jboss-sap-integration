@@ -98,7 +98,9 @@ def main():
    averageCustomersInStore = config.getint('Customers', 'averageCustomersInStore')
    fakeDataFile = config.get('Customers', 'list')
 
+
    mqttc = mqtt.Client(mqttClientName)
+   mqttc.username_pw_set('admin', 'admin')
    mqttc.connect(mqttHost, mqttPort)
   
    # load customer list
