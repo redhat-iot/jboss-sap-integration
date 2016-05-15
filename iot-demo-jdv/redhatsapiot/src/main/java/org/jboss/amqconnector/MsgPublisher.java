@@ -76,7 +76,7 @@ public class MsgPublisher implements MqttCallback {
 				message.setPayload((output).getBytes());
 
 				if (output.contains("New Customer")) {
-					clientSender.publish("customerenter", message);
+		//			clientSender.publish("customerenter", message);
 
 				} else if (output.contains("Moving")) {
 					if (i % 200 == 0) {
@@ -93,11 +93,11 @@ public class MsgPublisher implements MqttCallback {
 						ClassificationMsgPublisher.doDemo(id, pt, timestamp, "focused customer");
 					}
 					
-					clientSender.publish("customermove", message);
+				//	clientSender.publish("customermove", message);
 					
 
 				} else if (output.contains("Exiting")) {
-					clientSender.publish("customerexit", message);
+				//	clientSender.publish("customerexit", message);
 
 				}
 
@@ -128,7 +128,7 @@ public class MsgPublisher implements MqttCallback {
 		String msg = message.toString();
 		System.out.println("Received: " + msg);
 		 // Entry Point to invoke rules
-		RuleProcessor.invokeRules(msg);
+		RuleProcessor.invokeRules(topic, msg);
 	}
 	
 
