@@ -51,13 +51,13 @@ public class RuleProcessor {
 		
        
 		 
-		Department deptOne = new Department("MENS", deptLocationOne,
+		Department deptOne = new Department("MENS", deptLocationOne, 
 				Department.REGULAR);
-		Department deptTwo = new Department("FORMAL", deptLocationTwo,
+		Department deptTwo = new Department("FORMAL", deptLocationTwo, 
 				Department.SPECIAL);
-		Department deptThree = new Department("BOYS", deptLocationThree,
+		Department deptThree = new Department("BOYS", deptLocationThree, 
 				Department.REGULAR);
-		Department deptFour = new Department("WOMAN", deptLocationFour,
+		Department deptFour = new Department("WOMENS", deptLocationFour,
 				Department.REGULAR);
 		Department deptFive = new Department("GIRLS", deptLocationFive,
 				Department.REGULAR);
@@ -75,7 +75,7 @@ public class RuleProcessor {
 
 	}
 
-	 public static void invokeRules(String message) {
+	 public static void invokeRules(String topic, String message) {
 
 		kSession = getKieSession();
 		kSession = insertDepartments();
@@ -84,7 +84,7 @@ public class RuleProcessor {
         String jsonString = null;
        
         
-		if (message.contains("Moving")) {
+		if (topic.contains("move")) {
 			jsonString = message.substring(
 					message.indexOf(": ") + 2, message.length());
 			JSONObject obj = new JSONObject(jsonString);
