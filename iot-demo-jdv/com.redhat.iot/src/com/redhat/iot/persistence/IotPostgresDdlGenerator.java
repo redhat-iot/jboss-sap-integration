@@ -8,10 +8,12 @@ import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import com.redhat.iot.persistence.RandomGenerator.City;
-import com.redhat.iot.persistence.RandomGenerator.State;
+import com.redhat.iot.persistence.DataProvider.City;
+import com.redhat.iot.persistence.DataProvider.State;
 
 public final class IotPostgresDdlGenerator {
 
@@ -26,8 +28,8 @@ public final class IotPostgresDdlGenerator {
     private static final Timestamp FIRST_ORDER_DATE = Timestamp.valueOf( LocalDateTime.of( 2010, 1, 1, 1, 1 ) );
     private static final Timestamp LAST_ORDER_DATE = new Timestamp( Instant.now().toEpochMilli() );
 
-    private static final float MIN_DISCOUNT = 10F;
-    private static final float MAX_DISCOUNT = 50F;
+    private static final int MIN_DISCOUNT = 10;
+    private static final int MAX_DISCOUNT = 50;
 
     private static final float MIN_PRICE = 1F;
     private static final float MAX_PRICE = 100.0F;
@@ -35,77 +37,107 @@ public final class IotPostgresDdlGenerator {
     private static final int MAX_ORDER_DETAILS = 7;
     private static final int MAX_QUANTITY = 5;
 
+    private static final int FIRST_STORE_ID = 9000;
+    private static final int NUM_STORES = 20;
+    private static final String STORE_TABLE = "\"Store\"";
+    private static final String STORE_COLUMNS = ( "\"id\", " + "\"phone\", " + "\"addressLine1\", " + "\"city\", "
+                                                  + "\"state\", " + "\"postalCode\"" );
+    private static final String CREATE_STORE_TABLE = "CREATE TABLE " + STORE_TABLE + " (\n"
+                                                     + "\t\"id\" integer NOT NULL,\n" + "\t\"phone\" text NOT NULL,\n"
+                                                     + "\t\"addressLine1\" text NOT NULL,\n"
+                                                     + "\t\"addressLine2\" text DEFAULT NULL,\n"
+                                                     + "\t\"city\" text NOT NULL,\n" + "\t\"state\" text NOT NULL,\n"
+                                                     + "\t\"postalCode\" text NOT NULL,\n"
+                                                     + "\t\"country\" text DEFAULT 'USA',\n"
+                                                     + "\tPRIMARY KEY ( \"id\" )\n" + " );";
+    private static final String INSERT_STORE_PATTERN = "INSERT INTO " + STORE_TABLE + " ( " + STORE_COLUMNS
+                                                       + ") VALUES ( %s, '%s', '%s', '%s', '%s', '%s' );";
+
     private static final int FIRST_CUSTOMER_ID = 10000;
     private static final int NUM_CUSTOMERS = 5000;
-    private static final int LAST_CUSTOMER_ID = ( FIRST_CUSTOMER_ID + NUM_CUSTOMERS - 1 );
+    private static final int LAST_CUSTOMER_ID = ( ( FIRST_CUSTOMER_ID + NUM_CUSTOMERS ) - 1 );
     private static final String CUSTOMER_TABLE = "\"Customer\"";
     private static final String CUSTOMER_COLUMNS = "\"id\", " + "\"name\", " + "\"phone\", " + "\"addressLine1\", "
-                                                   + "\"addressLine2\", " + "\"city\", " + "\"state\", "
-                                                   + "\"postalCode\", " + "\"country\", " + "\"creditLimit\"";
-    private static final String CREATE_CUSTOMER_TABLE = "CREATE TABLE " + CUSTOMER_TABLE + " ( \n"
-                                                        + "\t\"id\" int NOT NULL,\n"
-                                                        + "\t\"name\" varchar(50) NOT NULL,\n"
-                                                        + "\t\"phone\" varchar(50) NOT NULL,\n"
-                                                        + "\t\"addressLine1\" varchar(50) NOT NULL,\n"
-                                                        + "\t\"addressLine2\" varchar(50) DEFAULT NULL,\n"
-                                                        + "\t\"city\" varchar(50) NOT NULL,\n"
-                                                        + "\t\"state\" varchar(50) DEFAULT NULL,\n"
-                                                        + "\t\"postalCode\" varchar(15) DEFAULT NULL,\n"
-                                                        + "\t\"country\" varchar(50) NOT NULL,\n"
-                                                        + "\t\"creditLimit\" integer DEFAULT NULL,\n"
-                                                        + "\tPRIMARY KEY (\"id\")\n" + ");";
+                                                   + "\"city\", " + "\"state\", " + "\"postalCode\", "
+                                                   + "\"creditLimit\"";
+    private static final String CREATE_CUSTOMER_TABLE = "CREATE TABLE " + CUSTOMER_TABLE + " (\n"
+                                                        + "\t\"id\" integer NOT NULL,\n" + "\t\"name\" text NOT NULL,\n"
+                                                        + "\t\"phone\" text NOT NULL,\n"
+                                                        + "\t\"addressLine1\" text NOT NULL,\n"
+                                                        + "\t\"addressLine2\" text DEFAULT NULL,\n"
+                                                        + "\t\"city\" text NOT NULL,\n" + "\t\"state\" text NOT NULL,\n"
+                                                        + "\t\"postalCode\" text NOT NULL,\n"
+                                                        + "\t\"country\" text DEFAULT 'USA',\n"
+                                                        + "\t\"creditLimit\" integer DEFAULT 0,\n"
+                                                        + "\t\"storeId\" integer DEFAULT NULL,\n"
+                                                        + "\tPRIMARY KEY ( \"id\" ),\n"
+                                                        + "\tCONSTRAINT \"customer_store_fk\" FOREIGN KEY ( \"storeId\" ) REFERENCES \"Store\" ( \"id\" )\n"
+                                                        + ");";
     private static final String INSERT_CUSTOMER_PATTERN = "INSERT INTO " + CUSTOMER_TABLE + " ( " + CUSTOMER_COLUMNS
-                                                          + " ) VALUES ( '%s', '%s', '%s', '%s', %s, '%s', '%s', '%s', '%s', %s );";
+                                                          + " ) VALUES ( %s, '%s', '%s', '%s', '%s', '%s', '%s', %s );";
 
     private static final int FIRST_PRODUCT_ID = 1000;
-    private static final int NUM_PRODUCTS = 150;
-    private static final int LAST_PRODUCT_ID = ( FIRST_PRODUCT_ID + NUM_PRODUCTS - 1 );
+    private static final int NUM_PRODUCTS = 1000;
     private static final String PRODUCT_TABLE = "\"Product\"";
-    private static final String PRODUCT_COLUMNS = "\"productCode\", " + "\"productName\", " + "\"productSize\", "
-                                                  + "\"productVendor\", " + "\"productDescription\", "
-                                                  + "\"quantityInStock\", " + "\"buyPrice\", " + "\"MSRP\", "
-                                                  + "\"departmentCode\"";
-    private static final String CREATE_PRODUCT_TABLE = "CREATE TABLE " + PRODUCT_TABLE + " ( \n"
-                                                       + "\t\"productCode\" varchar NOT NULL,\n"
-                                                       + "\t\"productName\" varchar NOT NULL,\n"
-                                                       + "\t\"productSize\" varchar NOT NULL,\n"
-                                                       + "\t\"productVendor\" varchar NOT NULL,\n"
+    private static final String PRODUCT_COLUMNS = ( "\"id\", " + "\"productName\", " + "\"productSize\", "
+                                                    + "\"productVendor\", " + "\"productDescription\", "
+                                                    + "\"buyPrice\", " + "\"msrp\", " + "\"departmentCode\"" );
+    private static final String CREATE_PRODUCT_TABLE = "CREATE TABLE " + PRODUCT_TABLE + " (\n"
+                                                       + "\t\"id\" integer NOT NULL,\n"
+                                                       + "\t\"productName\" text NOT NULL,\n"
+                                                       + "\t\"productSize\" text NOT NULL,\n"
+                                                       + "\t\"productVendor\" text NOT NULL,\n"
                                                        + "\t\"productDescription\" text NOT NULL,\n"
-                                                       + "\t\"quantityInStock\" integer NOT NULL,\n"
                                                        + "\t\"buyPrice\" numeric(6,2) NOT NULL,\n"
-                                                       + "\t\"MSRP\" numeric(6,2) NOT NULL,\n"
-                                                       + "\t\"departmentCode\" varchar NOT NULL,\n"
-                                                       + "\tPRIMARY KEY (\"productCode\")\n" + ");";
+                                                       + "\t\"msrp\" numeric(6,2) NOT NULL,\n"
+                                                       + "\t\"departmentCode\" integer NOT NULL,\n"
+                                                       + "\tPRIMARY KEY ( \"id\" )\n" + ");";
     private static final String INSERT_PRODUCT_PATTERN = "INSERT INTO " + PRODUCT_TABLE + " ( " + PRODUCT_COLUMNS
-                                                         + " ) VALUES ( %s, '%s', '%s', '%s', '%s', %s, '%s', '%s', %s );";
+                                                         + " ) VALUES ( %s, '%s', '%s', '%s', '%s', '%s', '%s', %s );";
+
+    private static final int MAX_STOCK = 2000;
+    private static final int NUM_INVENTORY = 5000;
+    private static final String INVENTORY_TABLE = "\"Inventory\"";
+    private static final String INVENTORY_COLUMNS = ( "\"storeId\", " + "\"productId\", " + "\"quantity\"" );
+    private static final String CREATE_INVENTORY_TABLE = "CREATE TABLE " + INVENTORY_TABLE + " (\n"
+                                                         + "\t\"storeId\" integer NOT NULL,\n"
+                                                         + "\t\"productId\" integer NOT NULL,\n"
+                                                         + "\t\"quantity\" integer NOT NULL,\n"
+                                                         + "\tPRIMARY KEY ( \"storeId\", \"productId\" ),\n"
+                                                         + "\tCONSTRAINT \"inventory_store_fk\" FOREIGN KEY ( \"storeId\" ) REFERENCES \"Store\" ( \"id\" ),\n"
+                                                         + "\tCONSTRAINT \"inventory_product_fk\" FOREIGN KEY ( \"productId\" ) REFERENCES \"Product\" ( \"id\" )\n"
+                                                         + ");";
+    private static final String INSERT_INVENTORY_PATTERN = "INSERT INTO " + INVENTORY_TABLE + " ( " + INVENTORY_COLUMNS
+                                                           + " ) VALUES ( %s, %s, %s );";
 
     private static final int FIRST_ORDER_ID = 1;
     private static final int NUM_ORDERS = 1000;
     private static final String ORDER_TABLE = "\"Order\"";
-    private static final String ORDER_COLUMNS = "\"orderNumber\", " + "\"orderDate\", " + "\"customerNumber\"";
-    private static final String CREATE_ORDER_TABLE = "CREATE TABLE " + ORDER_TABLE + " ( \n"
-                                                     + "\t\"orderNumber\" integer NOT NULL,\n"
-                                                     + "\t\"orderDate\" date NOT NULL,\n" + "\t\"comments\" text,\n"
-                                                     + "\t\"customerNumber\" integer NOT NULL,\n"
-                                                     + "\tPRIMARY KEY (\"orderNumber\"),\n"
-                                                     + "\tCONSTRAINT \"orders_ibfk_1\" FOREIGN KEY (\"customerNumber\") REFERENCES \"Customer\" (\"id\")\n"
+    private static final String ORDER_COLUMNS = ( "\"id\", " + "\"customerId\", " + "\"orderDate\"" );
+    private static final String CREATE_ORDER_TABLE = "CREATE TABLE " + ORDER_TABLE + " (\n"
+                                                     + "\t\"id\" integer NOT NULL,\n"
+                                                     + "\t\"customerId\" integer NOT NULL,\n"
+                                                     + "\t\"orderDate\" date NOT NULL,\n"
+                                                     + "\t\"comments\" text DEFAULT NULL,\n"
+                                                     + "\tPRIMARY KEY ( \"id\" ),\n"
+                                                     + "\tCONSTRAINT \"orders_customer_fk\" FOREIGN KEY ( \"customerId\" ) REFERENCES \"Customer\" ( \"id\" )\n"
                                                      + ");";
     private static final String INSERT_ORDER_PATTERN = "INSERT INTO " + ORDER_TABLE + " ( " + ORDER_COLUMNS
-                                                       + " ) VALUES ( %s, '%s', %s );";
+                                                       + " ) VALUES ( %s, %s, '%s' );";
 
     private static final int NUM_ORDER_DETAILS = 2000;
     private static final String ORDER_DETAIL_TABLE = "\"OrderDetail\"";
-    private static final String ORDER_DETAIL_COLUMNS = "\"orderNumber\", " + "\"productCode\", "
-                                                       + "\"quantityOrdered\", " + "\"msrp\", " + "\"discount\"";
-    private static final String CREATE_ORDER_DETAIL_TABLE = "CREATE TABLE " + ORDER_DETAIL_TABLE + " ( \n"
-                                                            + "\t\"orderNumber\" integer NOT NULL,\n"
-                                                            + "\t\"productCode\" varchar(15) NOT NULL,\n"
+    private static final String ORDER_DETAIL_COLUMNS = ( "\"orderId\", " + "\"productId\", " + "\"quantityOrdered\", "
+                                                         + "\"msrp\", " + "\"discount\"" );
+    private static final String CREATE_ORDER_DETAIL_TABLE = "CREATE TABLE " + ORDER_DETAIL_TABLE + " (\n"
+                                                            + "\t\"orderId\" integer NOT NULL,\n"
+                                                            + "\t\"productId\" integer NOT NULL,\n"
                                                             + "\t\"quantityOrdered\" integer NOT NULL,\n"
                                                             + "\t\"msrp\" numeric(6,2) NOT NULL,\n"
                                                             + "\t\"discount\" integer NOT NULL,\n"
-                                                            + "\tPRIMARY KEY (\"orderNumber\",\"productCode\"),\n"
-                                                            + "\tCONSTRAINT \"orderdetails_ibfk_2\" FOREIGN KEY (\"productCode\") REFERENCES \"Product\" (\"productCode\"),\n"
-                                                            + "\tCONSTRAINT \"orderdetails_ibfk_1\" FOREIGN KEY (\"orderNumber\") REFERENCES \"Order\" (\"orderNumber\")\n"
+                                                            + "\tPRIMARY KEY ( \"orderId\", \"productId\" ),\n"
+                                                            + "\tCONSTRAINT \"orderdetails_product_fk\" FOREIGN KEY ( \"productId\" ) REFERENCES \"Product\" ( \"id\" ),\n"
+                                                            + "\tCONSTRAINT \"orderdetails_order_fk\" FOREIGN KEY ( \"orderId\" ) REFERENCES \"Order\" ( \"id\" )\n"
                                                             + ");";
     private static final String INSERT_ORDER_DETAIL_PATTERN = "INSERT INTO " + ORDER_DETAIL_TABLE + " ( "
                                                               + ORDER_DETAIL_COLUMNS
@@ -114,29 +146,33 @@ public final class IotPostgresDdlGenerator {
     private static final int FIRST_PROMOTION_ID = 1;
     private static final int NUM_PROMOTIONS = 150;
     private static final String PROMOTION_TABLE = "\"Promotion\"";
-    private static final String PROMOTION_COLUMNS = "\"id\", " + "\"productCode\", " + "\"discount\"";
-    private static final String CREATE_PROMOTION_TABLE = "CREATE TABLE " + PROMOTION_TABLE + " ( \n"
+    private static final String PROMOTION_COLUMNS = "\"id\", " + "\"productId\", " + "\"discount\"";
+    private static final String CREATE_PROMOTION_TABLE = "CREATE TABLE " + PROMOTION_TABLE + " (\n"
                                                          + "\t\"id\" integer NOT NULL,\n"
-                                                         + "\t\"productCode\" varchar(15) NOT NULL,\n"
-                                                         + "\t\"discount\" decimal(4,2) NOT NULL,\n"
-                                                         + "\tPRIMARY KEY (\"id\",\"productCode\"),\n"
-                                                         + "\tCONSTRAINT \"orderdetails_ibfk_2\" FOREIGN KEY (\"productCode\") REFERENCES \"Product\" (\"productCode\")\n"
+                                                         + "\t\"productId\" integer NOT NULL,\n"
+                                                         + "\t\"discount\" integer NOT NULL,\n"
+                                                         + "\tPRIMARY KEY ( \"id\", \"productId\" ),\n"
+                                                         + "\tCONSTRAINT \"orderdetails_product_fk\" FOREIGN KEY ( \"productId\" ) REFERENCES \"Product\" ( \"id\" )\n"
                                                          + ");";
     private static final String INSERT_PROMOTION_PATTERN = "INSERT INTO " + PROMOTION_TABLE + " ( " + PROMOTION_COLUMNS
-                                                           + " ) VALUES ( %s, '%s', %s );";
+                                                           + " ) VALUES ( %s, %s, %s );";
 
-    private static final String[] TABLES = new String[] { CUSTOMER_TABLE,
+    private static final String[] TABLES = new String[] { STORE_TABLE,
+                                                          CUSTOMER_TABLE,
                                                           PRODUCT_TABLE,
+                                                          INVENTORY_TABLE,
                                                           ORDER_TABLE,
                                                           ORDER_DETAIL_TABLE,
                                                           PROMOTION_TABLE };
-    private static final String[] CREATE_TABLES = new String[] { CREATE_CUSTOMER_TABLE,
+    private static final String[] CREATE_TABLES = new String[] { CREATE_STORE_TABLE,
+                                                                 CREATE_CUSTOMER_TABLE,
                                                                  CREATE_PRODUCT_TABLE,
+                                                                 CREATE_INVENTORY_TABLE,
                                                                  CREATE_ORDER_TABLE,
                                                                  CREATE_ORDER_DETAIL_TABLE,
                                                                  CREATE_PROMOTION_TABLE };
 
-    public static void main( String[] args ) {
+    public static void main( final String[] args ) {
         try {
             final long start = System.currentTimeMillis();
             final IotPostgresDdlGenerator generator = new IotPostgresDdlGenerator();
@@ -151,6 +187,8 @@ public final class IotPostgresDdlGenerator {
         }
     }
 
+    private int lastProductId;
+    private final Map< String, Void > names = new HashMap<>();
     private final RandomGenerator random;
 
     IotPostgresDdlGenerator() throws Exception {
@@ -168,6 +206,11 @@ public final class IotPostgresDdlGenerator {
         writeCreateTables( ddl );
         System.out.println( "done." );
 
+        System.out.print( "Generating insert stores DDL ... " );
+        generateStores( ddl );
+        System.out.println( "done." );
+        System.out.println( "\tNumber of stores = " + NUM_STORES );
+
         System.out.print( "Generating insert customers DDL ... " );
         generateCustomers( ddl );
         System.out.println( "done." );
@@ -177,6 +220,11 @@ public final class IotPostgresDdlGenerator {
         generateProducts( ddl );
         System.out.println( "done." );
         System.out.println( "\tNumber of products = " + NUM_PRODUCTS );
+
+        System.out.print( "Generating insert inventory DDL ... " );
+        generateInventory( ddl );
+        System.out.println( "done." );
+        System.out.println( "\tNumber of inventory = " + NUM_INVENTORY );
 
         System.out.print( "Generating insert promotions DDL ... " );
         generatePromotions( ddl );
@@ -199,21 +247,21 @@ public final class IotPostgresDdlGenerator {
     }
 
     private void generateCustomers( final StringBuilder ddl ) throws Exception {
-        ddl.append( "--" ).append( CUSTOMER_TABLE.substring( 1, ( CUSTOMER_TABLE.length() - 1 ) ) ).append( "\n\n" );
+        ddl.append( "\n--" ).append( CUSTOMER_TABLE.substring( 1, ( CUSTOMER_TABLE.length() - 1 ) ) ).append( "\n\n" );
 
         for ( int i = FIRST_CUSTOMER_ID, limit = ( FIRST_CUSTOMER_ID + NUM_CUSTOMERS ); i < limit; ++i ) {
-            final City place = this.random.nextCity();
+            final City place = nextCity();
             final int id = i;
-            final String name = this.random.nextName();
-            final String addressLine1 = this.random.nextAddressLine1();
+            final String name = nextName();
+            final String addressLine1 = nextAddressLine1();
             final String city = place.getCity();
             final State state = place.getState();
-            final String phone = this.random.nextPhoneNumber( state );
+            final String phone = nextPhoneNumber( state );
             final String postalCode = place.getPostalCode();
             final double creditLimit = this.random.next( 1000, 10000 );
 
-            final String customerDdl = String.format( INSERT_CUSTOMER_PATTERN, id, name, phone, addressLine1, null,
-                                                      city, state.getName(), postalCode, "USA", creditLimit );
+            final String customerDdl = String.format( INSERT_CUSTOMER_PATTERN, id, name, phone, addressLine1, city,
+                                                      state.getName(), postalCode, creditLimit );
             ddl.append( customerDdl ).append( '\n' );
         }
     }
@@ -221,6 +269,38 @@ public final class IotPostgresDdlGenerator {
     private String generateDescription( final String name,
                                         final String vendor ) {
         return ( "A " + name + " by manufacturer " + vendor );
+    }
+
+    private void generateInventory( final StringBuilder ddl ) {
+        ddl.append( "\n--" ).append( INVENTORY_TABLE.substring( 1, ( INVENTORY_TABLE.length() - 1 ) ) )
+                .append( "\n\n" );
+
+        // make sure the same store and product are not already used
+        final Map< Integer, List< Integer > > storeProducts = new HashMap<>();
+
+        for ( int i = 0; i < NUM_INVENTORY; ++i ) {
+            int storeId = -1;
+            int productId = -1;
+
+            do {
+                storeId = this.random.next( FIRST_STORE_ID, ( ( FIRST_STORE_ID + NUM_STORES ) - 1 ) );
+                productId = this.random.next( FIRST_PRODUCT_ID, this.lastProductId );
+            } while ( storeProducts.containsKey( storeId ) && storeProducts.get( storeId ).contains( productId ) );
+
+            List< Integer > products = storeProducts.get( storeId );
+
+            if ( products == null ) {
+                products = new ArrayList<>();
+            }
+
+            products.add( productId );
+            storeProducts.put( storeId, products );
+
+            final int quantity = this.random.next( 1, MAX_STOCK );
+
+            final String inventoryDdl = String.format( INSERT_INVENTORY_PATTERN, storeId, productId, quantity );
+            ddl.append( inventoryDdl ).append( '\n' );
+        }
     }
 
     private void generateOrderDetails( final StringBuilder ddl ) {
@@ -232,21 +312,21 @@ public final class IotPostgresDdlGenerator {
 
             // create details for each order
             for ( int j = 0, numDetails = this.random.next( 1, MAX_ORDER_DETAILS ); j < numDetails; ++j ) {
-                final int orderNumber = i;
-                int productCode = this.random.next( FIRST_PRODUCT_ID, LAST_PRODUCT_ID );
+                final int orderId = i;
+                int productId = this.random.next( FIRST_PRODUCT_ID, this.lastProductId );
 
-                while ( prodIds.contains( productCode ) ) {
-                    productCode = this.random.next( FIRST_PRODUCT_ID, LAST_PRODUCT_ID );
+                while ( prodIds.contains( productId ) ) {
+                    productId = this.random.next( FIRST_PRODUCT_ID, this.lastProductId );
                 }
 
-                prodIds.add( productCode );
+                prodIds.add( productId );
 
                 final int quantity = this.random.next( 1, MAX_QUANTITY );
                 final float msrp = this.random.nextPrice( MIN_PRICE, MAX_PRICE );
-                final int discount = ( int ) this.random.next( MIN_DISCOUNT, MAX_DISCOUNT );
+                final int discount = this.random.next( MIN_DISCOUNT, MAX_DISCOUNT );
 
-                final String detailsDdl = String.format( INSERT_ORDER_DETAIL_PATTERN, orderNumber, productCode,
-                                                         quantity, msrp, discount );
+                final String detailsDdl = String.format( INSERT_ORDER_DETAIL_PATTERN, orderId, productId, quantity,
+                                                         msrp, discount );
                 ddl.append( detailsDdl ).append( '\n' );
             }
         }
@@ -260,29 +340,32 @@ public final class IotPostgresDdlGenerator {
             final Timestamp orderDate = this.random.next( FIRST_ORDER_DATE, LAST_ORDER_DATE );
             final int customerId = this.random.next( FIRST_CUSTOMER_ID, LAST_CUSTOMER_ID );
 
-            final String orderDdl = String.format( INSERT_ORDER_PATTERN, id, DATE_FORMATTER.format( orderDate ),
-                                                   customerId );
+            final String orderDdl = String.format( INSERT_ORDER_PATTERN, id, customerId,
+                                                   DATE_FORMATTER.format( orderDate ) );
             ddl.append( orderDdl ).append( '\n' );
         }
     }
 
-    private void generateProducts( final StringBuilder ddl ) {
+    private void generateProducts( final StringBuilder ddl ) throws Exception {
         ddl.append( "\n--" ).append( PRODUCT_TABLE.substring( 1, ( PRODUCT_TABLE.length() - 1 ) ) ).append( "\n\n" );
 
-        for ( int i = FIRST_PRODUCT_ID, limit = ( FIRST_PRODUCT_ID + NUM_PRODUCTS ); i < limit; ++i ) {
-            final int id = i;
-            final String name = this.random.nextProduct();
-            final String size = this.random.nextSize();
-            final String vendor = this.random.nextVendor();
+        for ( int i = FIRST_PRODUCT_ID, limit = ( FIRST_PRODUCT_ID + NUM_PRODUCTS ); i < limit; i += DataProvider
+                .getSizes().size() ) {
+            final String name = nextProduct();
+            final String vendor = nextVendor();
             final String description = generateDescription( name, vendor );
-            final int quantityInStock = this.random.next( 1, MAX_QUANTITY );
             final String buyPrice = nextPrice();
             final String msrp = nextPrice();
             final int departmentCode = this.random.next( FIRST_DEPT, LAST_DEPT );
+            int j = 0;
 
-            final String productDdl = String.format( INSERT_PRODUCT_PATTERN, id, name, size, vendor, description,
-                                                     quantityInStock, buyPrice, msrp, departmentCode );
-            ddl.append( productDdl ).append( '\n' );
+            // create a product for each size
+            for ( final String size : DataProvider.getSizes() ) {
+                this.lastProductId = ( i + j++ );
+                final String productDdl = String.format( INSERT_PRODUCT_PATTERN, this.lastProductId, name, size, vendor,
+                                                         description, buyPrice, msrp, departmentCode );
+                ddl.append( productDdl ).append( '\n' );
+            }
         }
     }
 
@@ -292,17 +375,97 @@ public final class IotPostgresDdlGenerator {
 
         for ( int i = FIRST_PROMOTION_ID, limit = ( FIRST_PROMOTION_ID + NUM_PROMOTIONS ); i < limit; ++i ) {
             final int id = i;
-            final int productCode = this.random.next( FIRST_PRODUCT_ID, LAST_PRODUCT_ID );
-            final float discount = this.random.nextPrice( MIN_DISCOUNT, MAX_DISCOUNT );
+            final int productId = this.random.next( FIRST_PRODUCT_ID, this.lastProductId );
+            final int discount = this.random.next( MIN_DISCOUNT, MAX_DISCOUNT );
 
-            final String productDdl = String.format( INSERT_PROMOTION_PATTERN, id, productCode, discount );
+            final String productDdl = String.format( INSERT_PROMOTION_PATTERN, id, productId, discount );
             ddl.append( productDdl ).append( '\n' );
         }
+    }
+
+    private void generateStores( final StringBuilder ddl ) throws Exception {
+        ddl.append( "\n--" ).append( STORE_TABLE.substring( 1, ( STORE_TABLE.length() - 1 ) ) ).append( "\n\n" );
+
+        for ( int i = FIRST_STORE_ID, limit = ( FIRST_STORE_ID + NUM_STORES ); i < limit; ++i ) {
+            final City place = nextCity();
+            final int id = i;
+            final String addressLine1 = nextAddressLine1();
+            final String city = place.getCity();
+            final State state = place.getState();
+            final String phone = nextPhoneNumber( state );
+            final String postalCode = place.getPostalCode();
+
+            final String storeDdl = String.format( INSERT_STORE_PATTERN, id, phone, addressLine1, city, state.getName(),
+                                                   postalCode );
+            ddl.append( storeDdl ).append( '\n' );
+        }
+    }
+
+    private String nextAddressLine1() throws Exception {
+        final int number = this.random.next( 1, 900 );
+        final String street = nextStreet();
+        final String suffix = this.random.next( DataProvider.getStreetSuffixes() );
+        return ( number + " " + street + ' ' + suffix );
+    }
+
+    private int nextAreaCode( final State state ) throws Exception {
+        return this.random.next( DataProvider.getAreaCodes( state.getAbbreviation() ) );
+    }
+
+    private City nextCity() throws Exception {
+        return this.random.next( DataProvider.getCities() );
+    }
+
+    private String nextName() throws Exception {
+        final boolean female = this.random.next();
+        String first = ( female ? this.random.next( DataProvider.getFemaleNames() )
+                                : this.random.next( DataProvider.getMaleNames() ) );
+        String last = this.random.next( DataProvider.getLastNames() );
+        String name = ( first + ' ' + last );
+
+        while ( this.names.containsKey( name ) ) {
+            first = ( female ? this.random.next( DataProvider.getFemaleNames() )
+                             : this.random.next( DataProvider.getMaleNames() ) );
+            last = this.random.next( DataProvider.getLastNames() );
+            name = ( first + ' ' + last );
+        }
+
+        this.names.put( name, null );
+        return name;
+    }
+
+    private String nextPhoneNumber( final State state ) throws Exception {
+        final StringBuilder builder = new StringBuilder();
+        builder.append( '(' ).append( nextAreaCode( state ) ).append( ')' );
+
+        for ( int i = 0; i < 3; ++i ) {
+            builder.append( this.random.next( 0, 9 ) );
+        }
+
+        builder.append( '-' );
+
+        for ( int i = 0; i < 4; ++i ) {
+            builder.append( this.random.next( 0, 9 ) );
+        }
+
+        return builder.toString();
     }
 
     private String nextPrice() {
         final float price = this.random.nextPrice( MIN_PRICE, MAX_PRICE );
         return String.format( "%.2f", price );
+    }
+
+    private String nextProduct() throws Exception {
+        return this.random.next( DataProvider.getProducts() );
+    }
+
+    private String nextStreet() throws Exception {
+        return this.random.next( DataProvider.getStreets() );
+    }
+
+    private String nextVendor() throws Exception {
+        return this.random.next( DataProvider.getVendors() );
     }
 
     private void writeCreateTables( final StringBuilder builder ) {
@@ -315,8 +478,10 @@ public final class IotPostgresDdlGenerator {
     private void writeDropTables( final StringBuilder builder ) {
         for ( final String table : TABLES ) {
             builder.append( String.format( DROP_TABLE_PATTERN, table ) );
-            builder.append( "\n\n" );
+            builder.append( '\n' );
         }
+
+        builder.append( '\n' );
     }
 
 }
