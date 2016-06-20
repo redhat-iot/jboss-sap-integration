@@ -1,0 +1,6 @@
+Kids
+Large
+Medium
+Petite
+Small
+X-Large
