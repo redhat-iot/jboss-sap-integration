@@ -300,7 +300,6 @@ public final class DataProvider {
     private static List< String > load( final String fileName,
                                         final int numItems ) throws Exception {
         final String inputFileName = ( "resources/" + fileName );
-        System.out.print( "Loading file '" + inputFileName + "' ... " );
         final List< String > temp = new ArrayList<>( numItems );
         final Path input = Paths.get( inputFileName );
         final String content = new String( Files.readAllBytes( input ) );
@@ -309,11 +308,7 @@ public final class DataProvider {
             temp.add( line );
         }
 
-        final List< String > result = Collections.unmodifiableList( temp );
-        System.out.println( "done." );
-        System.out.println( "\t" + temp.size() + " items loaded." );
-
-        return result;
+        return Collections.unmodifiableList( temp );
     }
 
     /**
