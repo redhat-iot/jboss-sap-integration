@@ -1,0 +1,271 @@
+CREATE USER fuse IDENTIFIED BY sqlsql
+go
+
+-------------------------------------------------
+--   Create tables
+-------------------------------------------------
+
+CREATE TABLE "dba"."Customers" (
+    "id"                             integer NOT NULL
+   ,"name"                           long varchar NOT NULL
+   ,"lastVisit"                      bigint NULL
+   ,"averagePurchaseAmount"          numeric(6,2) NULL
+   ,PRIMARY KEY ("id" ASC) 
+)
+go
+
+CREATE TABLE "dba"."CustomerMovements" (
+    "id"                             integer NOT NULL DEFAULT global autoincrement(100000)
+   ,"customerID"                     integer NOT NULL
+   ,"locationX"                      integer NOT NULL
+   ,"locationY"                      integer NOT NULL
+   ,"ts"                             timestamp NOT NULL
+   ,PRIMARY KEY ("id" ASC) 
+)
+go
+
+CREATE TABLE "dba"."CustomerDepartments" (
+    "id"                             integer NOT NULL DEFAULT global autoincrement(100000)
+   ,"customerID"                     integer NOT NULL
+   ,"departmentID"                   integer NOT NULL
+   ,"ts"                             timestamp NOT NULL
+   ,PRIMARY KEY ("id" ASC) 
+)
+go
+
+DROP TABLE  "dba"."Product"
+go
+
+DROP TABLE  "dba"."Department"
+go
+
+CREATE TABLE  "dba"."Department" (
+  "departmentCode" long varchar  NOT NULL
+  ,"departmentName" long varchar  NOT NULL
+  ,"departmentDescription" text NOT NULL
+  ,"dimension" st_geometry  NOT NULL
+  ,PRIMARY KEY ("departmentCode" ASC)
+)
+go
+
+CREATE TABLE  "dba"."Product" (
+  "productCode" long varchar  NOT NULL
+  ,"productName" long varchar  NOT NULL
+  ,"productSize" long varchar  NOT NULL
+  ,"productVendor" long varchar  NOT NULL
+  ,"productDescription" text NOT NULL
+  ,"buyPrice" numeric(6,2) NOT NULL
+  ,"MSRP"  numeric(6,2) NOT NULL
+  ,"departmentCode"   long varchar  NOT NULL
+  ,PRIMARY KEY ("productCode" ASC)
+)
+go
+
+CREATE TABLE  "dba"."Inventory" (
+  "storeId" long varchar  NOT NULL
+  ,"productCode" long varchar  NOT NULL
+  ,"quantity" long varchar  NOT NULL
+  ,PRIMARY KEY ( "storeId", "productCode" )
+)
+go
+
+commit work
+go
+
+-------------------------------------------------
+--   Create foreign keys
+-------------------------------------------------
+
+ALTER TABLE "dba"."CustomerMovements"
+    ADD FOREIGN KEY "Customers" ("customerID" ASC)
+    REFERENCES "dba"."Customers" ("id")
+go
+
+ALTER TABLE "dba"."CustomerDepartments"
+    ADD FOREIGN KEY "Customers" ("customerID" ASC)
+    REFERENCES "dba"."Customers" ("id")
+go
+
+ALTER TABLE "dba"."Product"
+    ADD FOREIGN KEY (dept) 
+    REFERENCES "dba"."Department"(departmentCode)
+go
+
+ALTER TABLE "dba"."Inventory"
+    ADD FOREIGN KEY (product) 
+    REFERENCES "dba"."Product"(productCode)
+go
+
+commit work
+go
+
+
+
+-------------------------------------------------
+--   Create functions
+-------------------------------------------------
+
+commit
+go
+
+create function "dba"."epochToTS"( in "secondsSinceEpoch" bigint ) 
+returns "DATETIME"
+begin
+  return "DATEADD"("second","secondsSinceEpoch"/1000,'1970/01/01')
+end
+go
+
+create function "dba"."GlobalINIVariables"( in "iniString" long varchar ) 
+returns integer
+begin
+  declare "splitPoint" integer;
+  set "splitPoint" = "CHARINDEX"('=',"iniString");
+  execute immediate 'CREATE OR REPLACE DATABASE VARIABLE $' || "SUBSTRING"("iniString",1,"splitPoint"-1) || ' LONG VARCHAR = ''' || "SUBSTRING"("iniString","splitPoint"+1) || '''';
+  return 0
+end
+go
+
+-------------------------------------------------
+--   Create procedures
+-------------------------------------------------
+
+commit
+go
+
+
+create procedure "dba"."sp_CustomerDepartment"()
+begin
+  insert into "CustomerDepartments"( "customerID","departmentID","ts" ) 
+    select "CustomerID","DepartmentID","epochToTS"("TimeStamp") as "ts"
+      from(select *
+          from openxml("HTTP_BODY"(),'/CustomerDepartmentEvent') with("CustomerID" long varchar
+            'CustomerID',"DepartmentID" integer
+            'DepartmentID',"TimeStamp" bigint
+            'TimeStamp')) as "dt";
+  commit work
+end
+go
+
+GRANT EXECUTE ON "dba"."sp_CustomerDepartment" TO "fuse"
+go
+
+create procedure "dba"."sp_CustomerMovement"()
+begin
+  insert into "CustomerMovements"( "customerID","locationX","locationY","ts" ) 
+    select "CustomerID","LocationX","LocationY","epochToTS"("TimeStamp") as "ts"
+      from(select *
+          from openxml("HTTP_BODY"(),'/CustomerMovementEvent') with("CustomerID" long varchar
+            'CustomerID',"LocationX" integer
+            'Location/X',"LocationY" integer
+            'Location/Y',"TimeStamp" bigint
+            'TimeStamp')) as "dt";
+  commit work
+end
+go
+
+GRANT EXECUTE ON "dba"."sp_CustomerMovement" TO "fuse"
+go
+
+create procedure "dba"."sp_CustomerClassification"()
+begin
+  declare @customerID long varchar;
+  declare @customerType integer;
+  declare @salesNotificationEventBody long varchar;
+  select "CustomerID","CustomerType" into @customerID,@customerType
+    from openxml("HTTP_BODY"(),'/CustomerClassificationEvent') with("CustomerID" long varchar
+      'CustomerID',"CustomerType" integer
+      'CustomerTypeID');
+  IF (SELECT AveragePurchaseAmount FROM Customers WHERE id = @customerID) > 180 THEN
+    set @salesNotificationEventBody
+       = (select 1 as "tag",
+        null as "parent",
+        @customerID as "SalesNotificationEvent!1!CustomerID!element",
+        "name" as "SalesNotificationEvent!1!Name!element",
+        "lastVisit" as "SalesNotificationEvent!1!LastVisit!element",
+        '$' || "averagePurchaseAmount" as "SalesNotificationEvent!1!AveragePurchaseAmount!element",
+        "DATEDIFF"("second",'1970/01/01',"NOW"()) as "SalesNotificationEvent!1!TimeStamp!element"
+        from "Customers" where "id" = @customerID for xml explicit);
+    select "Value" from "SalesNotification"("$fuse_host","$fuse_port",@salesNotificationEventBody) where "Attribute" = 'Status'
+  else
+    select null
+  end if
+end
+go
+
+GRANT EXECUTE ON "dba"."sp_CustomerClassification" TO "fuse"
+go
+
+create procedure "dba"."SalesNotification"( in "host" long varchar,in "port" long varchar,in "postBody" long varchar ) 
+result( "Attribute" long varchar,"Value" long varchar ) 
+url 'http://!host:!port/sales/notification'
+type 'HTTP:POST:text/xml'
+go
+
+
+CREATE EVENT "dba"."ReadINIFile" TYPE "DatabaseStart"  ENABLE 
+HANDLER
+begin  
+  declare filePath long varchar = SUBSTR(db_property('File'), 0, LENGTH(db_property('File')) - 1) || 'cfg'; 
+
+
+  declare disappear ARRAY OF ROW(res INTEGER);
+  select ARRAY_AGG(ROW("GlobalINIVariables"("row_value"))) INTO disappear from "sa_split_list"("xp_read_file"(filePath),'\x0A') where "CHARINDEX"('=',"row_value") > 0;
+end
+go
+
+TRIGGER EVENT ReadINIFile
+go
+
+-------------------------------------------------
+--   Create services
+-------------------------------------------------
+
+commit
+go
+
+CREATE SERVICE "customer/department" 
+    TYPE 'RAW' AUTHORIZATION OFF SECURE OFF URL PATH OFF USER "fuse" USING "METHODS=POST"  AS
+call "dba"."sp_CustomerDepartment"()
+go
+
+CREATE SERVICE "customer/classification" 
+    TYPE 'RAW' AUTHORIZATION OFF SECURE OFF URL PATH OFF USER "fuse" USING "METHODS=POST"  AS
+call "dba"."sp_CustomerClassification"()
+go
+
+CREATE SERVICE "customer/movement" 
+    TYPE 'RAW' AUTHORIZATION OFF SECURE OFF URL PATH OFF USER "fuse" USING "METHODS=POST"  AS
+call "dba"."sp_CustomerMovement"()
+go
+
+CREATE PUBLICATION store_demo (
+  TABLE Customers, TABLE CustomerDepartments, TABLE CustomerMovements, TABLE Product, TABLE Department
+)
+go
+
+CREATE SYNCHRONIZATION USER "remote" TYPE tcpip
+go
+
+CREATE SYNCHRONIZATION SUBSCRIPTION TO store_demo FOR "remote"
+go
+
+-------------------------------------------------
+--   Create data
+-------------------------------------------------
+
+/*Data for department table */
+
+insert into "Department" ("departmentCode","departmentName","departmentDescription","dimension")
+values('1000','Womans','Womans clothing and assessories.',ST_Geometry::ST_GeomFromWKT('POLYGON((35 31, 35 57, 181 57, 181 31, 35 31))'))
+insert into "Department" ("departmentCode","departmentName","departmentDescription","dimension")
+values('1001','Boys','Boys clothing and assessories.',ST_Geometry::ST_GeomFromWKT('POLYGON((31 99, 31 160, 90 160, 90 99, 31 99))'))
+insert into "Department" ("departmentCode","departmentName","departmentDescription","dimension")
+values('1002','Girls','Girls clothing and assessories.',ST_Geometry::ST_GeomFromWKT('POLYGON((110 99, 110 160, 171 161, 171 99, 110 99))'))
+insert into "Department" ("departmentCode","departmentName","departmentDescription","dimension")
+values('1003','Mens','Mens clothing and assessories.',ST_Geometry::ST_GeomFromWKT('POLYGON((197 132, 198 159, 268 159, 269 134, 197 132))'))
+insert into "Department" ("departmentCode","departmentName","departmentDescription","dimension")
+values('1004','Formal','Formal wear for men and women.',ST_Geometry::ST_GeomFromWKT('POLYGON((206 27, 206 102, 230 102, 228 27, 206 27))'))
+insert into "Department" ("departmentCode","departmentName","departmentDescription","dimension")
+values('1005','Sport','Sports wear for men and women.',ST_Geometry::ST_GeomFromWKT('POLYGON((242 27, 242 103, 265 103, 264 27, 242 27))'))
+
+
