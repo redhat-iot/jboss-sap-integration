@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#0094dd</color>
+    <color name="colorPrimaryDark">#ffc05d68</color>
+    <color name="colorAccent">#FF4C4C</color>
+    <color name="textHintColor">#D3D3D3</color>
+    <color name="textColorPrimary">@color/colorPrimary</color>
+    <color name="textColorSecondary">#000000</color>
+
+    <array name="dept_colors">
+        <item>#EEF3A5</item>
+        <item>#C7F3A5</item>
+        <item>#ECB66F</item>
+        <item>#A5EEF3</item>
+        <item>#DAB7F6</item>
+        <item>#A5C7F3</item>
+        <item>#F3A5C7</item>
+    </array>
+
+</resources>

@@ -1,0 +1,96 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:layout_margin="30dp"
+              android:orientation="vertical"
+              tools:context="com.redhat.iot.SettingsFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="50dp"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:labelFor="@+id/loginCurrentUser"
+            android:paddingEnd="8dp"
+            android:paddingStart="8dp"
+            android:text="@string/login_current_user"
+            android:textSize="20sp"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/settingsCurrentUser"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:labelFor="@+id/settingsStores"
+            android:paddingRight="8dp"
+            android:text="@string/settings_my_store"
+            android:textColor="@color/textColorSecondary"
+            android:textSize="18sp"/>
+
+        <Spinner
+            android:id="@+id/settingsStores"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/textColorPrimary"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:labelFor="@+id/settingsEnableNotifications"
+            android:paddingRight="8dp"
+            android:text="@string/settings_enable_notifications"
+            android:textColor="@color/textColorSecondary"
+            android:textSize="18sp"/>
+
+        <CheckBox
+            android:id="@+id/settingsEnableNotifications"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:buttonTint="@color/colorPrimary"
+            android:checked="true"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:labelFor="@+id/settingsNotificationInterval"
+            android:paddingRight="8dp"
+            android:text="@string/settings_notification_interval"
+            android:textColor="@color/textColorSecondary"
+            android:textSize="18sp"/>
+
+        <Spinner
+            android:id="@+id/settingsNotificationInterval"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/textColorPrimary"/>
+    </LinearLayout>
+</LinearLayout>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+                                    xmlns:app="http://schemas.android.com/apk/res-auto"
+                                    android:id="@+id/promotion_card_view"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:clickable="true"
+                                    app:cardCornerRadius="12dp"
+                                    app:cardElevation="4dp"
+                                    app:cardPreventCornerOverlap="false"
+                                    app:cardUseCompatPadding="true"
+                                    app:contentPadding="6dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/dealImage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:contentDescription="@string/iv_dealImage"
+            android:elevation="4dp"/>
+
+        <TextView
+            android:id="@+id/dealDept"
+            style="@style/MedTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:fontFamily="cursive"
+            android:textColor="@color/textColorSecondary"
+            android:textSize="20sp"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/dealSalePrice"
+            style="@style/MedTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/dealImage"
+            android:fontFamily="sans-serif-smallcaps"
+            android:gravity="center"
+            android:textColor="@color/colorAccent"
+            android:textSize="20sp"
+            android:textStyle="bold|italic"/>
+
+        <TextView
+            android:id="@+id/dealOriginalPrice"
+            style="@style/MedTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/dealSalePrice"
+            android:layout_below="@+id/dealDept"
+            android:layout_toEndOf="@+id/dealSalePrice"
+            android:fontFamily="sans-serif-smallcaps"
+            android:gravity="end"
+            android:textColor="@color/textColorSecondary"/>
+
+        <TextView
+            android:id="@+id/dealDescription"
+            style="@style/MedTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/dealSalePrice"
+            android:fontFamily="serif-monospace"
+            android:gravity="center"
+            android:textColor="@color/textColorSecondary"/>
+    </RelativeLayout>
+
+</android.support.v7.widget.CardView>

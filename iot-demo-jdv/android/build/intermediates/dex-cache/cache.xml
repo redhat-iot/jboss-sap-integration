@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        jar="/home/tjones/apps/plugins/Iot/app/build/intermediates/exploded-aar/com.android.support/cardview-v7/23.4.0/jars/classes.jar"
+        jumboMode="true"
+        revision="23.0.3"
+        sha1="d9ecde39b460470e655de6e47c05573d2d5a8bfb">
+        <dex dex="/home/tjones/apps/plugins/Iot/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-cardview-v7-23.4.0_249ea1f7094710c8c7deac23390b324fd8f5d8ad/classes.dex" />
+    </item>
+    <item
+        jar="/home/tjones/Android/Sdk/extras/android/m2repository/com/android/support/support-annotations/23.4.0/support-annotations-23.4.0.jar"
+        jumboMode="true"
+        revision="23.0.3"
+        sha1="ffbe55fdb2bb456b1485831706a9eac3300bb6b8">
+        <dex dex="/home/tjones/apps/plugins/Iot/app/build/intermediates/transforms/dex/debug/folders/1000/10/support-annotations-23.4.0_f6935313deb4f9ffe0bdbd4e26d6a7e12d8b646e/classes.dex" />
+    </item>
+    <item
+        jar="/home/tjones/apps/plugins/Iot/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.4.0/jars/classes.jar"
+        jumboMode="true"
+        revision="23.0.3"
+        sha1="548f06de403a9409f00554b3ee12a9fdea0e236c">
+        <dex dex="/home/tjones/apps/plugins/Iot/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-appcompat-v7-23.4.0_a70b197dfd6ec098391c947c88a9cc4f06e4563a/classes.dex" />
+    </item>
+    <item
+        jar="/home/tjones/apps/plugins/Iot/app/build/intermediates/exploded-aar/com.android.support/support-v4/23.4.0/jars/classes.jar"
+        jumboMode="true"
+        revision="23.0.3"
+        sha1="67bd36ee9340ec7c254108936ad16b24bed160cc">
+        <dex dex="/home/tjones/apps/plugins/Iot/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-support-v4-23.4.0_480432bc550214b8ae9a072cb5b122428a678ade/classes.dex" />
+    </item>
+    <item
+        jar="/home/tjones/apps/plugins/Iot/app/build/intermediates/incremental-runtime-classes/debug/instant-run.jar"
+        jumboMode="true"
+        revision="23.0.3"
+        sha1="681d25d1ffe267b95bfc2167f621eebaa43cca8f">
+        <dex dex="/home/tjones/apps/plugins/Iot/app/build/intermediates/transforms/dex/debug/folders/1000/10/instant-run_eeac8b572f65259c93facbe959bca65f9409a3a0/classes.dex" />
+    </item>
+    <item
+        jar="/home/tjones/apps/plugins/Iot/app/build/intermediates/exploded-aar/com.android.support/recyclerview-v7/23.4.0/jars/classes.jar"
+        jumboMode="true"
+        revision="23.0.3"
+        sha1="ec75036c3c52e451d0cde50a5aedaf5fd32354a0">
+        <dex dex="/home/tjones/apps/plugins/Iot/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-recyclerview-v7-23.4.0_7a35d523cb8eaf41f1ee21fb6b40d03b0a06e913/classes.dex" />
+    </item>
+    <item
+        jar="/home/tjones/apps/plugins/Iot/app/libs/android-async-http-1.4.9.jar"
+        jumboMode="true"
+        revision="23.0.3"
+        sha1="386a4339ffe52d5d63e80f9bed8d2b1d1a418249">
+        <dex dex="/home/tjones/apps/plugins/Iot/app/build/intermediates/transforms/dex/debug/folders/1000/2/android-async-http-1.4.9_ca1076aceb68c9c413de525369ae3cd0c4fe2d0b/classes.dex" />
+    </item>
+    <item
+        jar="/home/tjones/apps/plugins/Iot/app/build/intermediates/exploded-aar/com.android.support/support-v4/23.4.0/jars/libs/internal_impl-23.4.0.jar"
+        jumboMode="true"
+        revision="23.0.3"
+        sha1="ea3c07504d2c8f4b13aa17c45c1b68ed9c1c3674">
+        <dex dex="/home/tjones/apps/plugins/Iot/app/build/intermediates/transforms/dex/debug/folders/1000/10/internal_impl-23.4.0_cfba479de33eb0981b442a7166882f674dd8c901/classes.dex" />
+    </item>
+    <item
+        jar="/home/tjones/apps/plugins/Iot/app/build/intermediates/incremental-classes/debug/instant-run-bootstrap.jar"
+        jumboMode="true"
+        revision="23.0.3"
+        sha1="93b75898c4cd1b1875d3918c8fb80a2beccf693d">
+        <dex dex="/home/tjones/apps/plugins/Iot/app/build/intermediates/transforms/dex/debug/folders/1000/10/instant-run-bootstrap_7338598dd03f7a03816e65f28a9d1ac5b69b83e0/classes.dex" />
+    </item>
+    <item
+        jar="/home/tjones/apps/plugins/Iot/app/build/intermediates/exploded-aar/com.android.support/animated-vector-drawable/23.4.0/jars/classes.jar"
+        jumboMode="true"
+        revision="23.0.3"
+        sha1="de4db3785756bfb0915a9f59a9b3f2fea7407be4">
+        <dex dex="/home/tjones/apps/plugins/Iot/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-animated-vector-drawable-23.4.0_411d31b8e47e1141032e27ef3225a61f5945ecff/classes.dex" />
+    </item>
+    <item
+        jar="/home/tjones/apps/plugins/Iot/app/build/intermediates/exploded-aar/com.android.support/support-vector-drawable/23.4.0/jars/classes.jar"
+        jumboMode="true"
+        revision="23.0.3"
+        sha1="c2c594cace5d83a3227b2b6e658ecbfd586d3ed9">
+        <dex dex="/home/tjones/apps/plugins/Iot/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-support-vector-drawable-23.4.0_07d2f1e98843c9dccfc2089f6d759dbdc69acc29/classes.dex" />
+    </item>
+    <item
+        jar="/home/tjones/apps/plugins/Iot/app/build/intermediates/exploded-aar/com.android.support/design/23.4.0/jars/classes.jar"
+        jumboMode="true"
+        revision="23.0.3"
+        sha1="5326d9a850d491714fef8cbfaa9ea3416f0bf0d2">
+        <dex dex="/home/tjones/apps/plugins/Iot/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-design-23.4.0_c27f71897eeb5f6ea69d49e259ded2f147f3e74d/classes.dex" />
+    </item>
+
+</items>

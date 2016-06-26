@@ -1,0 +1,67 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:layout_margin="50dp"
+              android:orientation="vertical"
+              tools:context=".LoginFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="50dp"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:labelFor="@+id/loginCurrentUser"
+            android:paddingEnd="8dp"
+            android:paddingStart="8dp"
+            android:textStyle="bold"
+            android:text="@string/login_current_user"
+            android:textSize="20sp"/>
+
+        <TextView
+            android:id="@+id/loginCurrentUser"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"/>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/loginUserName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:textColor="@color/textHintColor"
+        android:textSize="20sp"/>
+
+    <EditText
+        android:id="@+id/loginUserId"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/edittext_top_bg"
+        android:digits="0123456789"
+        android:hint="@string/login_user_id_hint"
+        android:inputType="number"
+        android:maxLength="6"
+        android:padding="10dp"
+        android:textColor="@color/textColorSecondary"
+        android:textColorHint="@color/textHintColor"/>
+
+    <Button
+        android:id="@+id/loginSignIn"
+        style="@style/TextAppearance.AppCompat.Button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="4dp"
+        android:background="@drawable/button_default_bg"
+        android:enabled="false"
+        android:padding="10dp"
+        android:text="@string/login_sign_in"
+        android:textColor="@color/text_color"/>
+
+</LinearLayout>
