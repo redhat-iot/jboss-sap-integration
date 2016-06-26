@@ -17,13 +17,11 @@ import com.redhat.iot.persistence.DataProvider.State;
 
 public final class IotPostgresDdlGenerator {
 
-    private static final String OUTPUT_FILE = "../persistance/postgres.sql";
+    private static final String POSTGRES_OUTPUT_FILE = "../persistance/postgres.sql";
+    private static final String REMOTE_OUTPUT_FILE = "../persistance/remote.sql";
 
     private static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
-    private static final String DROP_TABLE_PATTERN = "DROP TABLE IF EXISTS %s CASCADE;";
-
-    private static final int FIRST_DEPT = 1000;
-    private static final int LAST_DEPT = 1006;
+    private static final String DROP_TABLE = "DROP TABLE IF EXISTS %s CASCADE;";
 
     private static final Timestamp FIRST_ORDER_DATE = Timestamp.valueOf( LocalDateTime.of( 2010, 1, 1, 1, 1 ) );
     private static final Timestamp LAST_ORDER_DATE = new Timestamp( Instant.now().toEpochMilli() );
@@ -36,6 +34,9 @@ public final class IotPostgresDdlGenerator {
 
     private static final int MAX_ORDER_DETAILS = 7;
     private static final int MAX_QUANTITY = 5;
+
+    private static final int FIRST_DEPT = 1000;
+    private static final int LAST_DEPT = 1005;
 
     private static final int FIRST_STORE_ID = 9000;
     private static final int NUM_STORES = 20;
@@ -50,12 +51,9 @@ public final class IotPostgresDdlGenerator {
                                                      + "\t\"postalCode\" text NOT NULL,\n"
                                                      + "\t\"country\" text DEFAULT 'USA',\n"
                                                      + "\tPRIMARY KEY ( \"id\" )\n" + " );";
-    private static final String INSERT_STORE_PATTERN = "INSERT INTO " + STORE_TABLE + " ( " + STORE_COLUMNS
-                                                       + ") VALUES ( %s, '%s', '%s', '%s', '%s', '%s' );";
+    private static final String INSERT_STORE = "INSERT INTO " + STORE_TABLE + " ( " + STORE_COLUMNS
+                                               + ") VALUES ( %s, '%s', '%s', '%s', '%s', '%s' );";
 
-    private static final int FIRST_CUSTOMER_ID = 10000;
-    private static final int NUM_CUSTOMERS = 5000;
-    private static final int LAST_CUSTOMER_ID = ( ( FIRST_CUSTOMER_ID + NUM_CUSTOMERS ) - 1 );
     private static final String CUSTOMER_TABLE = "\"Customer\"";
     private static final String CUSTOMER_COLUMNS = "\"id\", " + "\"name\", " + "\"phone\", " + "\"addressLine1\", "
                                                    + "\"city\", " + "\"state\", " + "\"postalCode\", "
@@ -73,8 +71,8 @@ public final class IotPostgresDdlGenerator {
                                                         + "\tPRIMARY KEY ( \"id\" ),\n"
                                                         + "\tCONSTRAINT \"customer_store_fk\" FOREIGN KEY ( \"storeId\" ) REFERENCES \"Store\" ( \"id\" )\n"
                                                         + ");";
-    private static final String INSERT_CUSTOMER_PATTERN = "INSERT INTO " + CUSTOMER_TABLE + " ( " + CUSTOMER_COLUMNS
-                                                          + " ) VALUES ( %s, '%s', '%s', '%s', '%s', '%s', '%s', %s );";
+    private static final String INSERT_CUSTOMER = "INSERT INTO " + CUSTOMER_TABLE + " ( " + CUSTOMER_COLUMNS
+                                                  + " ) VALUES ( %s, '%s', '%s', '%s', '%s', '%s', '%s', %s );";
 
     private static final int FIRST_PRODUCT_ID = 1000;
     private static final int NUM_PRODUCTS = 1000;
@@ -92,8 +90,13 @@ public final class IotPostgresDdlGenerator {
                                                        + "\t\"msrp\" numeric(6,2) NOT NULL,\n"
                                                        + "\t\"departmentCode\" integer NOT NULL,\n"
                                                        + "\tPRIMARY KEY ( \"id\" )\n" + ");";
-    private static final String INSERT_PRODUCT_PATTERN = "INSERT INTO " + PRODUCT_TABLE + " ( " + PRODUCT_COLUMNS
-                                                         + " ) VALUES ( %s, '%s', '%s', '%s', '%s', '%s', '%s', %s );";
+    private static final String PG_INSERT_PRODUCT = "INSERT INTO " + PRODUCT_TABLE + " ( " + PRODUCT_COLUMNS
+                                                    + " ) VALUES ( %s, '%s', '%s', '%s', '%s', %s, %s, %s );";
+    private static final String REMOTE_INSERT_PRODUCT = "INSERT INTO Product ( "
+                                                        + "\"productCode\", \"productName\", \"productSize\", \"productVendor\", "
+                                                        + "\"productDescription\", \"buyPrice\", \"MSRP\", \"departmentCode\""
+                                                        + ") VALUES ( "
+                                                        + "%s, '%s', '%s', '%s', '%s', %s, %s, %s )\ngo";
 
     private static final int MAX_STOCK = 2000;
     private static final int NUM_INVENTORY = 5000;
@@ -107,8 +110,10 @@ public final class IotPostgresDdlGenerator {
                                                          + "\tCONSTRAINT \"inventory_store_fk\" FOREIGN KEY ( \"storeId\" ) REFERENCES \"Store\" ( \"id\" ),\n"
                                                          + "\tCONSTRAINT \"inventory_product_fk\" FOREIGN KEY ( \"productId\" ) REFERENCES \"Product\" ( \"id\" )\n"
                                                          + ");";
-    private static final String INSERT_INVENTORY_PATTERN = "INSERT INTO " + INVENTORY_TABLE + " ( " + INVENTORY_COLUMNS
-                                                           + " ) VALUES ( %s, %s, %s );";
+    private static final String PG_INSERT_INVENTORY = "INSERT INTO " + INVENTORY_TABLE + " ( " + INVENTORY_COLUMNS
+                                                      + " ) VALUES ( %s, %s, %s );";
+    private static final String REMOTE_INSERT_INVENTORY = "INSERT INTO " + INVENTORY_TABLE + " ( " + INVENTORY_COLUMNS
+                                                          + " ) VALUES ( %s, %s, %s )\ngo";
 
     private static final int FIRST_ORDER_ID = 1;
     private static final int NUM_ORDERS = 1000;
@@ -122,8 +127,8 @@ public final class IotPostgresDdlGenerator {
                                                      + "\tPRIMARY KEY ( \"id\" ),\n"
                                                      + "\tCONSTRAINT \"orders_customer_fk\" FOREIGN KEY ( \"customerId\" ) REFERENCES \"Customer\" ( \"id\" )\n"
                                                      + ");";
-    private static final String INSERT_ORDER_PATTERN = "INSERT INTO " + ORDER_TABLE + " ( " + ORDER_COLUMNS
-                                                       + " ) VALUES ( %s, %s, '%s' );";
+    private static final String INSERT_ORDER = "INSERT INTO " + ORDER_TABLE + " ( " + ORDER_COLUMNS
+                                               + " ) VALUES ( %s, %s, '%s' );";
 
     private static final int NUM_ORDER_DETAILS = 2000;
     private static final String ORDER_DETAIL_TABLE = "\"OrderDetail\"";
@@ -139,9 +144,8 @@ public final class IotPostgresDdlGenerator {
                                                             + "\tCONSTRAINT \"orderdetails_product_fk\" FOREIGN KEY ( \"productId\" ) REFERENCES \"Product\" ( \"id\" ),\n"
                                                             + "\tCONSTRAINT \"orderdetails_order_fk\" FOREIGN KEY ( \"orderId\" ) REFERENCES \"Order\" ( \"id\" )\n"
                                                             + ");";
-    private static final String INSERT_ORDER_DETAIL_PATTERN = "INSERT INTO " + ORDER_DETAIL_TABLE + " ( "
-                                                              + ORDER_DETAIL_COLUMNS
-                                                              + " ) VALUES ( %s, %s, %s, %s, %s );";
+    private static final String INSERT_ORDER_DETAIL = "INSERT INTO " + ORDER_DETAIL_TABLE + " ( " + ORDER_DETAIL_COLUMNS
+                                                      + " ) VALUES ( %s, %s, %s, %s, %s );";
 
     private static final int FIRST_PROMOTION_ID = 1;
     private static final int NUM_PROMOTIONS = 150;
@@ -154,16 +158,16 @@ public final class IotPostgresDdlGenerator {
                                                          + "\tPRIMARY KEY ( \"id\", \"productId\" ),\n"
                                                          + "\tCONSTRAINT \"orderdetails_product_fk\" FOREIGN KEY ( \"productId\" ) REFERENCES \"Product\" ( \"id\" )\n"
                                                          + ");";
-    private static final String INSERT_PROMOTION_PATTERN = "INSERT INTO " + PROMOTION_TABLE + " ( " + PROMOTION_COLUMNS
-                                                           + " ) VALUES ( %s, %s, %s );";
+    private static final String INSERT_PROMOTION = "INSERT INTO " + PROMOTION_TABLE + " ( " + PROMOTION_COLUMNS
+                                                   + " ) VALUES ( %s, %s, %s );";
 
-    private static final String[] TABLES = new String[] { STORE_TABLE,
-                                                          CUSTOMER_TABLE,
-                                                          PRODUCT_TABLE,
-                                                          INVENTORY_TABLE,
-                                                          ORDER_TABLE,
+    private static final String[] DROP_TABLES = new String[] { PROMOTION_TABLE,
                                                           ORDER_DETAIL_TABLE,
-                                                          PROMOTION_TABLE };
+                                                          ORDER_TABLE,
+                                                          INVENTORY_TABLE,
+                                                          PRODUCT_TABLE,
+                                                          CUSTOMER_TABLE,
+                                                          STORE_TABLE };
     private static final String[] CREATE_TABLES = new String[] { CREATE_STORE_TABLE,
                                                                  CREATE_CUSTOMER_TABLE,
                                                                  CREATE_PRODUCT_TABLE,
@@ -173,86 +177,54 @@ public final class IotPostgresDdlGenerator {
                                                                  CREATE_PROMOTION_TABLE };
 
     public static void main( final String[] args ) {
-        try {
-            final long start = System.currentTimeMillis();
-            final IotPostgresDdlGenerator generator = new IotPostgresDdlGenerator();
-            final String ddl = generator.generate();
+        final long start = System.currentTimeMillis();
 
-            // write file out
-            final Path output = Paths.get( OUTPUT_FILE );
-            Files.write( output, ddl.toString().getBytes() );
-            System.out.println( "Finished DDL generation in " + ( System.currentTimeMillis() - start ) + "ms" );
+        try {
+            final IotPostgresDdlGenerator generator = new IotPostgresDdlGenerator();
+            generator.generateDdl();
+
+            {// write out Postgres DDL
+                final Path output = Paths.get( POSTGRES_OUTPUT_FILE );
+                Files.write( output, generator.getPostgresDdl().getBytes() );
+            }
+
+            { // write out remote.sql file
+                final Path output = Paths.get( REMOTE_OUTPUT_FILE );
+                Files.write( output, generator.getRemoteDdl().getBytes() );
+            }
+
+            System.out.println( "Finished generating and writing DDL in " + ( System.currentTimeMillis() - start )
+                                + "ms" );
         } catch ( final Exception e ) {
             e.printStackTrace();
         }
     }
 
+    private int firstCustId;
+    private int lastCustId;
     private int lastProductId;
-    private final Map< String, Void > names = new HashMap<>();
     private final RandomGenerator random;
+    private final StringBuilder remoteDdl = new StringBuilder();
+    private final StringBuilder postgresDdl = new StringBuilder();
 
     IotPostgresDdlGenerator() throws Exception {
         this.random = new RandomGenerator();
     }
 
-    private String generate() throws Exception {
-        final StringBuilder ddl = new StringBuilder();
-
-        System.out.print( "Dropping tables ... " );
-        writeDropTables( ddl );
-        System.out.println( "done." );
-
-        System.out.print( "Creating tables ... " );
-        writeCreateTables( ddl );
-        System.out.println( "done." );
-
-        System.out.print( "Generating insert stores DDL ... " );
-        generateStores( ddl );
-        System.out.println( "done." );
-        System.out.println( "\tNumber of stores = " + NUM_STORES );
-
-        System.out.print( "Generating insert customers DDL ... " );
-        generateCustomers( ddl );
-        System.out.println( "done." );
-        System.out.println( "\tNumber of customers = " + NUM_CUSTOMERS );
-
-        System.out.print( "Generating insert products DDL ... " );
-        generateProducts( ddl );
-        System.out.println( "done." );
-        System.out.println( "\tNumber of products = " + NUM_PRODUCTS );
-
-        System.out.print( "Generating insert inventory DDL ... " );
-        generateInventory( ddl );
-        System.out.println( "done." );
-        System.out.println( "\tNumber of inventory = " + NUM_INVENTORY );
-
-        System.out.print( "Generating insert promotions DDL ... " );
-        generatePromotions( ddl );
-        System.out.println( "done." );
-        System.out.println( "\tNumber of promotions = " + NUM_PROMOTIONS );
-
-        System.out.print( "Generating insert orders DDL ... " );
-        generateOrders( ddl );
-        System.out.println( "done." );
-        System.out.println( "\tNumber of orders = " + NUM_ORDERS );
-
-        System.out.print( "Generating insert order details DDL ... " );
-        generateOrderDetails( ddl );
-        System.out.println( "done." );
-        System.out.println( "\tNumber of order details = " + NUM_ORDER_DETAILS );
-
-        ddl.append( "\n\ncommit;\n\n" );
-
-        return ddl.toString();
-    }
-
     private void generateCustomers( final StringBuilder ddl ) throws Exception {
         ddl.append( "\n--" ).append( CUSTOMER_TABLE.substring( 1, ( CUSTOMER_TABLE.length() - 1 ) ) ).append( "\n\n" );
 
-        for ( int i = FIRST_CUSTOMER_ID, limit = ( FIRST_CUSTOMER_ID + NUM_CUSTOMERS ); i < limit; ++i ) {
+        // using customer ID and customer name from this file
+        final Path input = Paths.get( "../redhatsapiot/customers.dat" );
+        final String content = new String( Files.readAllBytes( input ) );
+        int custId = -1;
+        boolean firstTime = true;
+
+        for ( final String line : content.split( "\n" ) ) {
+            final String[] tokens = line.split( "\\|" );
+            custId = Integer.parseInt( tokens[ 0 ] );
+            final String name = tokens[ 1 ];
             final City place = nextCity();
-            final int id = i;
-            final String name = nextName();
             final String addressLine1 = nextAddressLine1();
             final String city = place.getCity();
             final State state = place.getState();
@@ -260,10 +232,80 @@ public final class IotPostgresDdlGenerator {
             final String postalCode = place.getPostalCode();
             final double creditLimit = this.random.next( 1000, 10000 );
 
-            final String customerDdl = String.format( INSERT_CUSTOMER_PATTERN, id, name, phone, addressLine1, city,
-                                                      state.getName(), postalCode, creditLimit );
+            final String customerDdl = String.format( INSERT_CUSTOMER, toDdl( custId ), toDdl( name ), toDdl( phone ),
+                                                      toDdl( addressLine1 ), toDdl( city ), toDdl( state.getName() ),
+                                                      toDdl( postalCode ), toDdl( creditLimit ) );
             ddl.append( customerDdl ).append( '\n' );
+
+            if ( firstTime ) {
+                this.firstCustId = custId;
+                firstTime = false;
+            }
         }
+
+        this.lastCustId = custId;
+    }
+
+    private void generateDdl() throws Exception {
+        System.out.print( "Generating hard-coded remote SQL DDL ... " );
+        final Path input = Paths.get( "resources/remote.sql.txt" );
+        final String content = new String( Files.readAllBytes( input ) );
+
+        for ( final String line : content.split( "\n" ) ) {
+            this.remoteDdl.append( line ).append( '\n' );
+        }
+
+        this.remoteDdl.append( '\n' );
+        System.out.println( "done." );
+
+        System.out.print( "Generating drop Postgres tables ... " );
+        writeDropTables( this.postgresDdl );
+        System.out.println( "done." );
+
+        System.out.print( "Generating create Postgres tables ... " );
+        writeCreateTables( this.postgresDdl );
+        System.out.println( "done." );
+
+        System.out.print( "Generating Postgres insert stores DDL ... " );
+        generateStores( this.postgresDdl );
+        System.out.println( "done." );
+        System.out.println( "\tNumber of stores = " + NUM_STORES );
+
+        System.out.print( "Generating insert Postgres customers DDL ... " );
+        generateCustomers( this.postgresDdl );
+        System.out.println( "done." );
+        System.out.println( "\tNumber of customers = " + ( this.lastCustId - this.firstCustId + 1 ) );
+
+        System.out.print( "Generating insert Postgres and remote products DDL ... " );
+        generateProducts();
+        System.out.println( "done." );
+        System.out.println( "\tNumber of products = " + NUM_PRODUCTS );
+
+        System.out.print( "Generating insert Posgres and remote inventory DDL ... " );
+        generateInventory();
+        System.out.println( "done." );
+        System.out.println( "\tNumber of inventory = " + NUM_INVENTORY );
+
+        System.out.print( "Generating insert Postgres promotions DDL ... " );
+        generatePromotions( this.postgresDdl );
+        System.out.println( "done." );
+        System.out.println( "\tNumber of promotions = " + NUM_PROMOTIONS );
+
+        System.out.print( "Generating insert Postgres orders DDL ... " );
+        generateOrders( this.postgresDdl );
+        System.out.println( "done." );
+        System.out.println( "\tNumber of orders = " + NUM_ORDERS );
+
+        System.out.print( "Generating insert Postgres order details DDL ... " );
+        generateOrderDetails( this.postgresDdl );
+        System.out.println( "done." );
+        System.out.println( "\tNumber of order details = " + NUM_ORDER_DETAILS );
+
+        System.out.print( "Generating commit statements for Postgres and remote ... " );
+        this.postgresDdl.append( "\n\ncommit;\n\n" );
+        this.remoteDdl.append( "\ncommit work\n" );
+        this.remoteDdl.append( "go\n" );
+        System.out.println( "done." );
     }
 
     private String generateDescription( final String name,
@@ -271,9 +313,13 @@ public final class IotPostgresDdlGenerator {
         return ( "A " + name + " by manufacturer " + vendor );
     }
 
-    private void generateInventory( final StringBuilder ddl ) {
-        ddl.append( "\n--" ).append( INVENTORY_TABLE.substring( 1, ( INVENTORY_TABLE.length() - 1 ) ) )
+    private void generateInventory() {
+        this.postgresDdl.append( "\n--" ).append( INVENTORY_TABLE.substring( 1, ( INVENTORY_TABLE.length() - 1 ) ) )
                 .append( "\n\n" );
+        this.remoteDdl.append( "/* Data for Inventory table */\n\n" );
+
+        // pick one store's inventory to also write to remote.sql
+        final int remoteStore = this.random.next( FIRST_STORE_ID, ( ( FIRST_STORE_ID + NUM_STORES ) - 1 ) );
 
         // make sure the same store and product are not already used
         final Map< Integer, List< Integer > > storeProducts = new HashMap<>();
@@ -297,9 +343,16 @@ public final class IotPostgresDdlGenerator {
             storeProducts.put( storeId, products );
 
             final int quantity = this.random.next( 1, MAX_STOCK );
+            final String pgInventoryDdl = String.format( PG_INSERT_INVENTORY, toDdl( storeId ), toDdl( productId ),
+                                                         toDdl( quantity ) );
+            this.postgresDdl.append( pgInventoryDdl ).append( '\n' );
 
-            final String inventoryDdl = String.format( INSERT_INVENTORY_PATTERN, storeId, productId, quantity );
-            ddl.append( inventoryDdl ).append( '\n' );
+            // write to remote.sql if necessary
+            if ( remoteStore == storeId ) {
+                final String remoteInventoryDdl = String.format( REMOTE_INSERT_INVENTORY, toDdl( storeId ),
+                                                                 toDdl( productId ), toDdl( quantity ) );
+                this.remoteDdl.append( remoteInventoryDdl ).append( '\n' );
+            }
         }
     }
 
@@ -325,8 +378,8 @@ public final class IotPostgresDdlGenerator {
                 final float msrp = this.random.nextPrice( MIN_PRICE, MAX_PRICE );
                 final int discount = this.random.next( MIN_DISCOUNT, MAX_DISCOUNT );
 
-                final String detailsDdl = String.format( INSERT_ORDER_DETAIL_PATTERN, orderId, productId, quantity,
-                                                         msrp, discount );
+                final String detailsDdl = String.format( INSERT_ORDER_DETAIL, toDdl( orderId ), toDdl( productId ),
+                                                         toDdl( quantity ), toDdl( msrp ), toDdl( discount ) );
                 ddl.append( detailsDdl ).append( '\n' );
             }
         }
@@ -338,16 +391,18 @@ public final class IotPostgresDdlGenerator {
         for ( int i = FIRST_ORDER_ID, limit = ( FIRST_ORDER_ID + NUM_ORDERS ); i < limit; ++i ) {
             final int id = i;
             final Timestamp orderDate = this.random.next( FIRST_ORDER_DATE, LAST_ORDER_DATE );
-            final int customerId = this.random.next( FIRST_CUSTOMER_ID, LAST_CUSTOMER_ID );
+            final int customerId = this.random.next( this.firstCustId, this.lastCustId );
 
-            final String orderDdl = String.format( INSERT_ORDER_PATTERN, id, customerId,
-                                                   DATE_FORMATTER.format( orderDate ) );
+            final String orderDdl = String.format( INSERT_ORDER, toDdl( id ), toDdl( customerId ),
+                                                   toDdl( DATE_FORMATTER.format( orderDate ) ) );
             ddl.append( orderDdl ).append( '\n' );
         }
     }
 
-    private void generateProducts( final StringBuilder ddl ) throws Exception {
-        ddl.append( "\n--" ).append( PRODUCT_TABLE.substring( 1, ( PRODUCT_TABLE.length() - 1 ) ) ).append( "\n\n" );
+    private void generateProducts() throws Exception {
+        this.postgresDdl.append( "\n--" ).append( PRODUCT_TABLE.substring( 1, ( PRODUCT_TABLE.length() - 1 ) ) )
+                .append( "\n\n" );
+        this.remoteDdl.append( "/* Data for Product table */\n\n" );
 
         for ( int i = FIRST_PRODUCT_ID, limit = ( FIRST_PRODUCT_ID + NUM_PRODUCTS ); i < limit; i += DataProvider
                 .getSizes().size() ) {
@@ -362,11 +417,26 @@ public final class IotPostgresDdlGenerator {
             // create a product for each size
             for ( final String size : DataProvider.getSizes() ) {
                 this.lastProductId = ( i + j++ );
-                final String productDdl = String.format( INSERT_PRODUCT_PATTERN, this.lastProductId, name, size, vendor,
-                                                         description, buyPrice, msrp, departmentCode );
-                ddl.append( productDdl ).append( '\n' );
+
+                { // insert into postres DDL
+                    final String pgProductDdl = String.format( PG_INSERT_PRODUCT, toDdl( this.lastProductId ),
+                                                               toDdl( name ), toDdl( size ), toDdl( vendor ),
+                                                               toDdl( description ), toDdl( buyPrice ), toDdl( msrp ),
+                                                               toDdl( departmentCode ) );
+                    this.postgresDdl.append( pgProductDdl ).append( '\n' );
+                }
+
+                { // insert into remote DDL
+                    final String remoteProductDdl = String.format( REMOTE_INSERT_PRODUCT, toDdl( this.lastProductId ),
+                                                                   toDdl( name ), toDdl( size ), toDdl( vendor ),
+                                                                   toDdl( description ), toDdl( buyPrice ),
+                                                                   toDdl( msrp ), toDdl( departmentCode ) );
+                    this.remoteDdl.append( remoteProductDdl ).append( '\n' );
+                }
             }
         }
+
+        this.remoteDdl.append( '\n' );
     }
 
     private void generatePromotions( final StringBuilder ddl ) {
@@ -378,7 +448,8 @@ public final class IotPostgresDdlGenerator {
             final int productId = this.random.next( FIRST_PRODUCT_ID, this.lastProductId );
             final int discount = this.random.next( MIN_DISCOUNT, MAX_DISCOUNT );
 
-            final String productDdl = String.format( INSERT_PROMOTION_PATTERN, id, productId, discount );
+            final String productDdl = String.format( INSERT_PROMOTION, toDdl( id ), toDdl( productId ),
+                                                     toDdl( discount ) );
             ddl.append( productDdl ).append( '\n' );
         }
     }
@@ -395,10 +466,18 @@ public final class IotPostgresDdlGenerator {
             final String phone = nextPhoneNumber( state );
             final String postalCode = place.getPostalCode();
 
-            final String storeDdl = String.format( INSERT_STORE_PATTERN, id, phone, addressLine1, city, state.getName(),
-                                                   postalCode );
+            final String storeDdl = String.format( INSERT_STORE, toDdl( id ), toDdl( phone ), toDdl( addressLine1 ),
+                                                   toDdl( city ), toDdl( state.getName() ), toDdl( postalCode ) );
             ddl.append( storeDdl ).append( '\n' );
         }
+    }
+
+    public String getPostgresDdl() {
+        return this.postgresDdl.toString();
+    }
+
+    public String getRemoteDdl() {
+        return this.remoteDdl.toString();
     }
 
     private String nextAddressLine1() throws Exception {
@@ -414,24 +493,6 @@ public final class IotPostgresDdlGenerator {
 
     private City nextCity() throws Exception {
         return this.random.next( DataProvider.getCities() );
-    }
-
-    private String nextName() throws Exception {
-        final boolean female = this.random.next();
-        String first = ( female ? this.random.next( DataProvider.getFemaleNames() )
-                                : this.random.next( DataProvider.getMaleNames() ) );
-        String last = this.random.next( DataProvider.getLastNames() );
-        String name = ( first + ' ' + last );
-
-        while ( this.names.containsKey( name ) ) {
-            first = ( female ? this.random.next( DataProvider.getFemaleNames() )
-                             : this.random.next( DataProvider.getMaleNames() ) );
-            last = this.random.next( DataProvider.getLastNames() );
-            name = ( first + ' ' + last );
-        }
-
-        this.names.put( name, null );
-        return name;
     }
 
     private String nextPhoneNumber( final State state ) throws Exception {
@@ -468,6 +529,14 @@ public final class IotPostgresDdlGenerator {
         return this.random.next( DataProvider.getVendors() );
     }
 
+    private Object toDdl( final Object value ) {
+        if ( ( value == null ) || !( value instanceof String ) ) {
+            return value;
+        }
+
+        return ( ( String ) value ).replace( "'", "''" ); // escape any single quotes
+    }
+
     private void writeCreateTables( final StringBuilder builder ) {
         for ( final String table : CREATE_TABLES ) {
             builder.append( table );
@@ -476,8 +545,8 @@ public final class IotPostgresDdlGenerator {
     }
 
     private void writeDropTables( final StringBuilder builder ) {
-        for ( final String table : TABLES ) {
-            builder.append( String.format( DROP_TABLE_PATTERN, table ) );
+        for ( final String table : DROP_TABLES ) {
+            builder.append( String.format( DROP_TABLE, table ) );
             builder.append( '\n' );
         }
 

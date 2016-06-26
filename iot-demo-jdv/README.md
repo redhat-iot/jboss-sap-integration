@@ -6,7 +6,7 @@ Demo based on Red Hat JBoss Data Virtualization, A-MQ, BRMS, SQLAnywhere and HAN
 Architecture
 -----------------------
 ![alt text][architecture]
-[architecture]: https://github.com/tejones/jboss-sap-integration/blob/master/iot-demo-jdv/RH%20SAP%20IOT%20061016.png "Reference Architecture"
+[architecture]: https://github.com/tejones/jboss-sap-integration/blob/master/iot-demo-jdv/RHSAPIOT_ARCHITECTURE.png "Reference Architecture"
 
 Prerequisites
 -----------------------
