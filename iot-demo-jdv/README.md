@@ -83,7 +83,7 @@ The global_database_id must be unique for each databaes that is created. If you 
 Supporting Articles
 -------------------
 
-Coming soon...
+https://developer.jboss.org/blogs/tedjones/2016/06/27/iot-demo-using-sap-iot-edge-with-red-hat
 
 
 Released versions
