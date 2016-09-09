@@ -28,11 +28,11 @@ import org.w3c.dom.Node;
 
 public class SapServiceProcessor {
 
-    public static final String CUST_ENTRY_URL_CALL ="http://localhost:8080/customer/department";
+    public static final String CUST_ENTRY_URL_CALL ="http://localhost:8081/customer/department";
     
-    public static final String CUST_MOVE_URL_CALL ="http://localhost:8080/customer/movement";
+    public static final String CUST_MOVE_URL_CALL ="http://localhost:8081/customer/movement";
 
-    public static final String CUST_CLASS_URL_CALL ="http://localhost:8080/customer/classification";
+    public static final String CUST_CLASS_URL_CALL ="http://localhost:8081/customer/classification";
 
 	public static void main(String[] args) throws IOException,
 			TransformerException {
@@ -53,16 +53,20 @@ public class SapServiceProcessor {
 			doc = icBuilder.newDocument();
 			Element mainRootElement = doc
 					.createElement("CustomerDepartmentEvent");
+			Node defaultId = null;
 			Node cid = null;
 			Node deptId = null;
 			Node ts = null;
+			defaultId = doc.createElement("id");
 			cid = doc.createElement("CustomerID");
 			deptId = doc.createElement("DepartmentID");
 			ts = doc.createElement("TimeStamp");
+			defaultId.setTextContent("DEFAULT");
 			cid.setTextContent(custId);
 			deptId.setTextContent(depId.toString());
 			ts.setTextContent(String.valueOf(timestamp));
 			// mainRootElement.appendChild(cid).setNodeValue("8be0cca0-3841-4183-9cbf-b8507294a06f");
+			mainRootElement.appendChild(defaultId);
 			mainRootElement.appendChild(cid);
 			// mainRootElement.appendChild(deptId).setNodeValue("0");
 			mainRootElement.appendChild(deptId);
@@ -98,11 +102,13 @@ public class SapServiceProcessor {
 			doc = icBuilder.newDocument();
 			Element mainRootElement = doc
 					.createElement("CustomerMovementEvent");
+			Node defaultId = null;
 			Node cid = null;
 			Node location = null;
 			Node ts = null;
 			Node xLoc = null;
 			Node yLoc = null;
+			defaultId = doc.createElement("id");
 			cid = doc.createElement("CustomerID");
 			location = doc.createElement("Location");
 			xLoc = doc.createElement("X");
@@ -115,7 +121,9 @@ public class SapServiceProcessor {
 			cid.setTextContent(custId);
 			 
 			ts.setTextContent(String.valueOf(timestamp));
+			defaultId.setTextContent("DEFAULT");
 			// mainRootElement.appendChild(cid).setNodeValue("8be0cca0-3841-4183-9cbf-b8507294a06f");
+			mainRootElement.appendChild(defaultId);
 			mainRootElement.appendChild(cid);
 			// mainRootElement.appendChild(deptId).setNodeValue("0");
 			mainRootElement.appendChild(location);
@@ -140,19 +148,23 @@ public class SapServiceProcessor {
 			doc = icBuilder.newDocument();
 			Element mainRootElement = doc
 					.createElement("CustomerClassificationEvent");
+			Node defaultId = null;
 			Node cid = null;
 			Node ctypeId = null;
 			Node ts = null;
 			 
+			defaultId = doc.createElement("id");
 			cid = doc.createElement("CustomerID");
 			ctypeId = doc.createElement("CustomerTypeID");
 			 
 			
 			ts = doc.createElement("TimeStamp");
+			defaultId.setTextContent("DEFAULT");
 			cid.setTextContent(custId);
 			ctypeId.setTextContent(custClass.toString()); 
 			ts.setTextContent(String.valueOf(timestamp));
 			// mainRootElement.appendChild(cid).setNodeValue("8be0cca0-3841-4183-9cbf-b8507294a06f");
+			mainRootElement.appendChild(defaultId);
 			mainRootElement.appendChild(cid);
 			// mainRootElement.appendChild(deptId).setNodeValue("0");
 			mainRootElement.appendChild(ctypeId);
