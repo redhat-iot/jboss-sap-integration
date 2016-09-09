@@ -15,7 +15,7 @@ CREATE TABLE "dba"."Customers" (
 go
 
 CREATE TABLE "dba"."CustomerMovements" (
-    "id"                             integer NOT NULL DEFAULT global autoincrement(100000)
+    "id"                             integer DEFAULT autoincrement
    ,"customerID"                     integer NOT NULL
    ,"locationX"                      integer NOT NULL
    ,"locationY"                      integer NOT NULL
@@ -25,7 +25,7 @@ CREATE TABLE "dba"."CustomerMovements" (
 go
 
 CREATE TABLE "dba"."CustomerDepartments" (
-    "id"                             integer NOT NULL DEFAULT global autoincrement(100000)
+    "id"                             integer DEFAULT autoincrement
    ,"customerID"                     integer NOT NULL
    ,"departmentID"                   integer NOT NULL
    ,"ts"                             timestamp NOT NULL

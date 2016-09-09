@@ -70,38 +70,29 @@ public class MsgPublisher implements MqttCallback {
 					p.getErrorStream()));
 			String output = null;
 			// read the output from the command
-			System.out.println("Here is the standard output of the command:\n");
-			while ((output = stdInput.readLine()) != null) {
-				System.out.println(output);
-				message.setPayload((output).getBytes());
-
-				if (output.contains("New Customer")) {
-		//			clientSender.publish("customerenter", message);
-
-				} else if (output.contains("Moving")) {
-					if (i % 200 == 0) {
-						String jsonString = null;
-						jsonString = output.substring(
-								output.indexOf(": ") + 2, output.length());
-						JSONObject obj = new JSONObject(jsonString);
-
-						int x = obj.getInt("x");
-						int y = obj.getInt("y");
-						String id = obj.getString("id");
-						long timestamp = obj.getLong("ts");
-						Point pt = new Point(x, y);
-						ClassificationMsgPublisher.doDemo(id, pt, timestamp, "focused customer");
-					}
-					
-				//	clientSender.publish("customermove", message);
-					
-
-				} else if (output.contains("Exiting")) {
-				//	clientSender.publish("customerexit", message);
-
-				}
-
-			}
+//			System.out.println("Here is the standard output of the command:\n");
+//			while ((output = stdInput.readLine()) != null) {
+//				System.out.println(output);
+//				message.setPayload((output).getBytes());
+//
+//				if (output.contains("Moving")) {
+//					if (i % 200 == 0) {
+//						String jsonString = null;
+//						jsonString = output.substring(
+//								output.indexOf(": ") + 2, output.length());
+//						JSONObject obj = new JSONObject(jsonString);
+//
+//						int x = obj.getInt("x");
+//						int y = obj.getInt("y");
+//						String id = obj.getString("id");
+//						long timestamp = obj.getLong("ts");
+//						Point pt = new Point(x, y);
+//						ClassificationMsgPublisher.doDemo(id, pt, timestamp, "focused customer");
+//					}
+//					
+//				}
+//
+//			}
 
 			// read any errors from the attempted command
 			System.out

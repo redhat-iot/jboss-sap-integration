@@ -79,15 +79,9 @@ public class RuleProcessor {
 
 		kSession = getKieSession();
 		kSession = insertDepartments();
-		
 	
-        String jsonString = null;
-       
-        
 		if (topic.contains("move")) {
-			jsonString = message.substring(
-					message.indexOf(": ") + 2, message.length());
-			JSONObject obj = new JSONObject(jsonString);
+			JSONObject obj = new JSONObject(message);
 
 			int x = obj.getInt("x");
 			int y = obj.getInt("y");

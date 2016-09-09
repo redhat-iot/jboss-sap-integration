@@ -108,7 +108,7 @@ insert(new CustomerObj($custId, $location, $timestamp , 0 , dept.getDepartmentNa
 insert(new CustomerMoveObj($custId, 0));
 end
 
-rule "Customer in Pharmacy department (special) then increment visit count and invoke web service"
+rule "Customer in Mens department (special) then increment visit count and invoke web service"
 no-loop
 when 
 CustomerMoveEvent($custId :custId, $location : location, $timestamp : timestamp)
@@ -126,7 +126,7 @@ SapServiceProcessor.processXml(doc,SapServiceProcessor.CUST_MOVE_URL_CALL);
 end
 
 
-rule "Customer in food department (special) then increment visit count and invoke web service"
+rule "Customer in formal department (special) then increment visit count and invoke web service"
 no-loop
 when 
 CustomerMoveEvent($custId :custId, $location : location, $timestamp : timestamp)
@@ -260,15 +260,15 @@ Document doc = SapServiceProcessor.constructCustomerEntry($custId, DepartmentTyp
 SapServiceProcessor.processXml(doc,SapServiceProcessor.CUST_ENTRY_URL_CALL);
 end
 
-rule "Customer is a fast moving customer"
+rule "Customer is a focused customer"
 
 when
 CustomerMoveEvent($custId :custId, $location : location, $timestamp : timestamp)
-custMvObj :CustomerMoveObj( custId == $custId , totalMoves == 1)
+custMvObj :CustomerMoveObj( custId == $custId , totalMoves == 3)
 then
 
 // call web service api 
-System.out.println("customer classification is focused fast moving customer");
+System.out.println("customer classification is focused moving customer");
 Document doc = SapServiceProcessor.constructCustomerClass($custId, 2 , $timestamp);
 SapServiceProcessor.processXml(doc,SapServiceProcessor.CUST_CLASS_URL_CALL);
 System.out.println("publish to salesnotification topic");
