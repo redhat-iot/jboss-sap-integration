@@ -57,7 +57,7 @@ Setup and Configuration
 - Create and populate the remote databaes. These commands will create the database, start it as a daemon listening on port 8080, and populate it with the fake customer data.
 
   - dbinit -dba dba,sqlsql remote.db
-  - dbsrv17 -ud -xs http{port=8080} remote.db
+  - dbsrv17 -ud -xs http{port=8081} remote.db
   - dbisql -c "uid=dba;pwd=sqlsql" remote.sql
 
 The global_database_id must be unique for each databaes that is created. If you need to create multiple databases, choose a new global_database_id each time.
